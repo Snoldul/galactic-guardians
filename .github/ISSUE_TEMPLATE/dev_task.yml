@@ -1,0 +1,34 @@
+name: Other development task
+description: For tasks that aren't feature requests or bug reports
+title: "[Devtask]: "
+labels: ["backlog"]
+projects: ["jbfredheim/4"]
+body:
+  - type: textarea
+    id: describe-task
+    attributes:
+      label: Describe the task
+      description: What needs to be done? Why?
+      placeholder: Tell us what needs to be done!
+      value: "A task!"
+    validations:
+        required: true
+  - type: textarea
+    id: how-to-implement
+    attributes:
+      label: What does the solution look like?
+      description: What does the solution look like? How do you think this issue should be solved?
+      placeholder: What do you want to see?
+      value: "... when loading the page i want to be able to...."
+    validations:
+        required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Tell us anything else you think we should know.
+      placeholder: Anything else we should know?
+      value: "Nothing else!"
+    validations:
+      required: false
+

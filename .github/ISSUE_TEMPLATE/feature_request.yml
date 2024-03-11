@@ -1,0 +1,34 @@
+name: Feature request
+description: Request a feature
+title: "[Feature]: "
+labels: ["backlog"]
+projects: ["jbfredheim/4"]
+body:
+  - type: textarea
+    id: describe-feature
+    attributes:
+      label: Describe the feature
+      description: What feature do you want to see? Please be as descriptive as possible.
+      placeholder: Tell us what you want to see!
+      value: "A feature!"
+    validations:
+      required: true
+  - type: textarea
+    id: how-to-implement
+    attributes:
+      label: What does the solution look like?
+      description: Tell us, in as much detail as possible, what the solution looks like.
+      placeholder: What do you want to see?
+      value: "I want to be able to click on this, which should trigger this other thing that makes something happen!"
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Tell us anything else you think we should know.
+      placeholder: Anything else we should know?
+      value: "Nothing else!"
+    validations:
+      required: false
+
