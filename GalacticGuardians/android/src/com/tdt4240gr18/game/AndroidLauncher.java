@@ -5,10 +5,8 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.tdt4240gr18.game.GalacticGuardians;
 
 public class AndroidLauncher extends AndroidApplication {
-	private FirebaseAnalytics firebaseAnalytics;
 
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
@@ -17,7 +15,7 @@ public class AndroidLauncher extends AndroidApplication {
 		initialize(new GalacticGuardians(), config);
 		FirebaseApp.initializeApp(this);
 
-		firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+		FirebaseAnalytics firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
 		// Log an event
 		Bundle bundle = new Bundle();
