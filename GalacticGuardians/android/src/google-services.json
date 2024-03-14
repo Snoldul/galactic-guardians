@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1010388342313",
+    "firebase_url": "https://galactic-guardians-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "galactic-guardians",
+    "storage_bucket": "galactic-guardians.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1010388342313:android:87abda9d3beb4ef775ee38",
+        "android_client_info": {
+          "package_name": "com.tdt4240gr18.game"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1010388342313-v1qpfvoi5abkrap7n282c720obui26s9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClqUk7S-4XnHUjdjFADvN3o5KP3lfHvp0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1010388342313-v1qpfvoi5abkrap7n282c720obui26s9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

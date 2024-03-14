@@ -34,4 +34,8 @@ public class GalacticGuardians extends ApplicationAdapter {
 	public void dispose() {
 		batch.dispose();
 	}
+
+
+
 }
+
