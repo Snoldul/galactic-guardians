@@ -23,7 +23,7 @@ public class AndroidLauncher extends AndroidApplication {
 
 		// Write a message to the database
 		FirebaseDatabase database = FirebaseDatabase.getInstance();
-		DatabaseReference myRef = database.getReference("message");
+		DatabaseReference myRef = database.getReference("/ost/message");
 
 		myRef.setValue("Hello, World!");
 
