@@ -28,4 +28,8 @@ public class GalacticGuardians extends ApplicationAdapter {
 		batch.dispose();
 		img.dispose();
 	}
+
+
+
 }
+
