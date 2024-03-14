@@ -1,32 +1,38 @@
 package com.tdt4240gr18.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class GalacticGuardians extends ApplicationAdapter {
+
+	GameStateInterface currentState;
 	SpriteBatch batch;
-	Texture img;
-	
+	public void changeState(GameStateInterface newState){
+		currentState = newState;
+	}
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+		currentState = new StartScreenState(this);
 	}
 
 	@Override
 	public void render () {
-		ScreenUtils.clear(1, 0, 0, 1);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
+
+		if(currentState == null){
+			return;
+		}
+		float dt = Gdx.graphics.getDeltaTime();
+		currentState.handleInput(dt);
+		currentState.update(dt);
+		currentState.render(batch);
 	}
 	
 	@Override
-	public void dispose () {
+	public void dispose() {
 		batch.dispose();
-		img.dispose();
 	}
 
 
