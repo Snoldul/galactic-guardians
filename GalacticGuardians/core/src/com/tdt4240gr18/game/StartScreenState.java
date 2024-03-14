@@ -24,7 +24,7 @@ public class StartScreenState implements GameStateInterface{
 
     @Override
     public void update(float dt) {
-
+        handleInput(dt);
     }
 
     @Override
