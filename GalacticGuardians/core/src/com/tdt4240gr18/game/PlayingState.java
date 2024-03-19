@@ -1,25 +1,24 @@
 package com.tdt4240gr18.game;
 
-import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.tdt4240gr18.game.entity.systems.PlayerControlSystem;
-import com.tdt4240gr18.game.entity.systems.MovementSystem;
-import com.tdt4240gr18.game.entity.systems.RenderingSystem;
+import com.tdt4240gr18.game.entity.components.TextureComponent;
 import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
-import com.tdt4240gr18.game.entity.components.TextureComponent;
+import com.tdt4240gr18.game.entity.systems.MovementSystem;
+import com.tdt4240gr18.game.entity.systems.PlayerControlSystem;
+import com.tdt4240gr18.game.entity.systems.RenderingSystem;
 
 
 public class PlayingState implements GameStateInterface{
-    private GalacticGuardians game;
-    private BitmapFont title = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
-    private PooledEngine engine = new PooledEngine();
+    private final GalacticGuardians game;
+    private final BitmapFont title = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
+    private final PooledEngine engine = new PooledEngine();
 
     public PlayingState(GalacticGuardians game){
         SpriteBatch sb = new SpriteBatch();
@@ -39,7 +38,7 @@ public class PlayingState implements GameStateInterface{
 
         // Set component values
         transform.position.set(0, 0, 0);
-        texture.region = new TextureRegion(new Texture(Gdx.files.internal("player.png")));
+        texture.region = new TextureRegion(new Texture(Gdx.files.internal("Player.png")));
 
         // Add components to player entity
         player.add(transform);
