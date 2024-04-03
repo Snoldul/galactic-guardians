@@ -1,14 +1,15 @@
 package com.tdt4240gr18.game;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 public class AndroidLauncher extends AndroidApplication {
+	//Don't know if this can be local and/or final
+	private FirebaseManager firebaseManager;
 
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
@@ -17,15 +18,45 @@ public class AndroidLauncher extends AndroidApplication {
 		initialize(new GalacticGuardians(), config);
 
 		FirebaseApp.initializeApp(this);
+		// TEMPORARY, FOR TESTING UNTIL "FRONTEND" BUTTONS ARE IMPLEMENTED
+		firebaseManager = new FirebaseManager();
 
+		String testEmail = "test@test.no";
+		String testPassword = "testPass123";
+		String testUsername = "testeren";
 
-		// Write a message to the database
-		FirebaseDatabase database = FirebaseDatabase.getInstance();
-		DatabaseReference myRef = database.getReference("/ost/message");
+		// TEMPORARY
+		// Calling register user function
+		firebaseManager.registerUser(testEmail, testPassword, testUsername, this, new FirebaseManager.OnRegistrationListener() {
+			@Override
+			public void onSuccess() {
+				Log.d("Registration", "Registration successful");
+			}
 
-		myRef.setValue("Hello, world!");
+			@Override
+			public void onFailure(String errorMessage) {
+				Log.e("Registration", "Registration failed: " + errorMessage);
+			}
+		});
 
+		// TEMPORARY
+		// Calling login function
+		firebaseManager.loginUser(testEmail, testPassword, this, new FirebaseManager.OnLoginListener() {
+			@Override
+			public void onSuccess(String userID) {
+				// User logged in successfully
+				// Actions that happen when user logs in goes here
+				Log.d("Login success", "Login successful, userID: " + userID);
+			}
+
+			@Override
+			public void onFailure(String errorMessage) {
+				Log.e("Login", "Login failed: " + errorMessage);
+			}
+		});
+
+		// TEMPORARY
+		// Calling logout function
+		firebaseManager.logoutUser();
 	}
-
-
 }
