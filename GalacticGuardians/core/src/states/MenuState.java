@@ -10,10 +10,10 @@ import java.util.List;
 
 public class MenuState extends State{
     private final float BUTTON_OFFSET;
-    private int width;
+    private final int width;
     public int height;
-    private Texture logo;
-    private List<MenuButton> buttons;
+    private final Texture logo;
+    private final List<MenuButton> buttons;
 
     public MenuState(GameStateManager gsm) {
         super(gsm);
@@ -37,6 +37,8 @@ public class MenuState extends State{
         buttons.add(button);
     }
 
+
+
     @Override
     public void handleInput() {
         if (Gdx.input.justTouched()) {
@@ -47,6 +49,10 @@ public class MenuState extends State{
                 if (button.isClicked(touchX, touchY)) {
                     if (button.getButtonText().equals("Start")) {
                         gsm.set(new PlayState(gsm));
+                        dispose();
+                    }
+                    if (button.getButtonText().equals("Leaderboard")) {
+                        gsm.set(new LeaderboardState(gsm));
                         dispose();
                     }
                 }

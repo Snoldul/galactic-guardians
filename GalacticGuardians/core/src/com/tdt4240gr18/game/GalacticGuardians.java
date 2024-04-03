@@ -10,11 +10,16 @@ import states.MenuState;
 public class GalacticGuardians extends ApplicationAdapter {
 	private GameStateManager gsm;
 	private SpriteBatch batch;
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		gsm = new GameStateManager();
 		gsm.push(new MenuState(gsm));
+	}
+
+	public boolean isAndroid() {
+		return false;
 	}
 
 	@Override
