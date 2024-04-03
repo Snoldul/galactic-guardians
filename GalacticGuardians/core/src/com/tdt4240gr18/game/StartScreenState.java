@@ -17,9 +17,12 @@ public class StartScreenState implements GameStateInterface{
 
     @Override
     public void handleInput(float dt) {
+        /*
         if (Gdx.input.isTouched()) {
-            game.changeState(new PlayingState(game));
+           gsm.set(new PlayingState(game));
         }
+
+         */
     }
 
     @Override
