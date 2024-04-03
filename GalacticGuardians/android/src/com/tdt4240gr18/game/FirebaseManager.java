@@ -44,8 +44,30 @@ public class FirebaseManager {
             });
     }
 
+    // Login method
+    public void loginUser(String email, String password, Activity activity, OnLoginListener listener) {
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(activity, task -> {
+                    if (task.isSuccessful()) {
+                        listener.onSuccess(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
+                    } else {
+                        String errorMessage = (Objects.requireNonNull(task.getException()).getMessage());
+                        listener.onFailure(errorMessage);
+                    }
+                });
+    }
+
+    public void logoutUser() {
+        mAuth.signOut();
+    }
+
     public interface OnRegistrationListener {
         void onSuccess();
+        void onFailure(String errorMessage);
+    }
+
+    public interface OnLoginListener {
+        void onSuccess(String userID);
         void onFailure(String errorMessage);
     }
 }

@@ -23,8 +23,10 @@ public class AndroidLauncher extends AndroidApplication {
 
 		String testEmail = "test@test.no";
 		String testPassword = "testPass123";
-		String testUsername = "Testeren1";
+		String testUsername = "testeren";
 
+		// TEMPORARY
+		// Calling register user function
 		firebaseManager.registerUser(testEmail, testPassword, testUsername, this, new FirebaseManager.OnRegistrationListener() {
 			@Override
 			public void onSuccess() {
@@ -37,6 +39,24 @@ public class AndroidLauncher extends AndroidApplication {
 			}
 		});
 
+		// TEMPORARY
+		// Calling login function
+		firebaseManager.loginUser(testEmail, testPassword, this, new FirebaseManager.OnLoginListener() {
+			@Override
+			public void onSuccess(String userID) {
+				// User logged in successfully
+				// Actions that happen when user logs in goes here
+				Log.d("Login success", "Login successful, userID: " + userID);
+			}
 
+			@Override
+			public void onFailure(String errorMessage) {
+				Log.e("Login", "Login failed: " + errorMessage);
+			}
+		});
+
+		// TEMPORARY
+		// Calling logout function
+		firebaseManager.logoutUser();
 	}
 }
