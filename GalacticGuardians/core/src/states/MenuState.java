@@ -22,19 +22,17 @@ public class MenuState extends State{
         height = Gdx.graphics.getHeight();
         buttons = new ArrayList<>();
         BUTTON_OFFSET = 20;
-        addButton("Start");
-        addButton("Leaderboard");
-        addButton("Options");
-        addButton("Quit");
-
+        buttons.add(addButton("Start"));
+        buttons.add(addButton("Leaderboard"));
+        buttons.add(addButton("Options"));
+        buttons.add(addButton("Quiit"));
     }
 
-    private void addButton(String text) {
+    private MenuButton addButton(String text) {
         Texture buttonTexture = new Texture("menuBtn.png");
         float x = (float) (width - buttonTexture.getWidth()) / 2;
         float y = ((float) height / 2) * 0.7f - buttons.size() * (buttonTexture.getHeight() + BUTTON_OFFSET);
-        MenuButton button = new MenuButton(buttonTexture, text, x, y);
-        buttons.add(button);
+        return new MenuButton(buttonTexture, text, x, y);
     }
 
 
@@ -47,6 +45,7 @@ public class MenuState extends State{
 
             for (MenuButton button : buttons) {
                 if (button.isClicked(touchX, touchY)) {
+                    // Burde egentlig bruke push og pop i stedet for set men får ikke til, skjermen blir bare svart etter å pop-e
                     if (button.getButtonText().equals("Start")) {
                         gsm.set(new PlayState(gsm));
                         dispose();

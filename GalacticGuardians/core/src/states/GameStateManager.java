@@ -1,5 +1,6 @@
 package states;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.Stack;
@@ -22,6 +23,12 @@ public class GameStateManager {
     public void set(State state){
         states.pop();
         states.push(state);
+    }
+
+    public void printStatesStack() {
+        for (State s : states) {
+            Gdx.app.log("stackPrint", s.toString());
+        }
     }
 
     public void update(float dt){
