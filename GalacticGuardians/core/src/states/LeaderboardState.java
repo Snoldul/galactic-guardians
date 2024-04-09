@@ -2,7 +2,11 @@ package states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
+import com.tdt4240gr18.game.LeaderboardEntry;
 import com.tdt4240gr18.game.MenuButton;
 
 import java.util.ArrayList;
@@ -15,6 +19,14 @@ public class LeaderboardState extends State{
     private final int width;
     public int height;
     private final int BUTTON_OFFSET;
+    private final BitmapFont font;
+    private GlyphLayout layout;
+    //private final Rectangle bounds;
+    private final Texture Backdrop;
+    private ArrayList<LeaderboardEntry> EntriesList;
+    // TEMPORARY:
+    LeaderboardEntry temp1, temp2, temp3, temp4;
+
 
 
 
@@ -26,6 +38,19 @@ public class LeaderboardState extends State{
         buttons = new ArrayList<>();
         BUTTON_OFFSET = 20;
         buttons.add(addButton("Back"));
+        this.font = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
+        //this.bounds = new Rectangle(x, y, texture.getWidth(), texture.getHeight());
+        Backdrop = new Texture("backdrop.png");
+
+        // TEMPORARY:
+        temp1 = new LeaderboardEntry("B01", 100);
+        temp2 = new LeaderboardEntry("B02", 200);
+        temp3 = new LeaderboardEntry("B03", 50);
+        temp4 = new LeaderboardEntry("B04", 400);
+        EntriesList.add(temp1);
+        EntriesList.add(temp2);
+        EntriesList.add(temp3);
+        EntriesList.add(temp4);
     }
 
     private boolean isAndroid() {
@@ -74,11 +99,14 @@ public class LeaderboardState extends State{
     @Override
     public void render(SpriteBatch sb) {
         sb.begin();
-            if (isAndr) {
-                for (MenuButton button : buttons) {
-                    button.render(sb);
-                }
+        //this.layout = new GlyphLayout(font, buttonText);
+        sb.draw(Backdrop, 50, 50);
+        if (isAndr) {
+
             }
+        for (MenuButton button : buttons) {
+            button.render(sb);
+        }
         sb.end();
     }
 
