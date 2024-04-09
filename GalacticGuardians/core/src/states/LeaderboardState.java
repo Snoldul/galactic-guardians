@@ -23,7 +23,7 @@ public class LeaderboardState extends State{
     private GlyphLayout layout;
     //private final Rectangle bounds;
     private final Texture Backdrop;
-    private ArrayList<LeaderboardEntry> EntriesList;
+    private List<LeaderboardEntry> EntriesList;
     // TEMPORARY:
     LeaderboardEntry temp1, temp2, temp3, temp4;
 
@@ -38,19 +38,22 @@ public class LeaderboardState extends State{
         buttons = new ArrayList<>();
         BUTTON_OFFSET = 20;
         buttons.add(addButton("Back"));
+        if (isAndr) {
+            buttons.add(addButton("Log in"));
+        }
         this.font = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
         //this.bounds = new Rectangle(x, y, texture.getWidth(), texture.getHeight());
-        Backdrop = new Texture("backdrop.png");
+        Backdrop = new Texture("backdrop1x2.png");
 
         // TEMPORARY:
-        temp1 = new LeaderboardEntry("B01", 100);
+/*        temp1 = new LeaderboardEntry("B01", 100);
         temp2 = new LeaderboardEntry("B02", 200);
         temp3 = new LeaderboardEntry("B03", 50);
         temp4 = new LeaderboardEntry("B04", 400);
         EntriesList.add(temp1);
         EntriesList.add(temp2);
         EntriesList.add(temp3);
-        EntriesList.add(temp4);
+        EntriesList.add(temp4);*/
     }
 
     private boolean isAndroid() {
@@ -100,7 +103,7 @@ public class LeaderboardState extends State{
     public void render(SpriteBatch sb) {
         sb.begin();
         //this.layout = new GlyphLayout(font, buttonText);
-        sb.draw(Backdrop, 50, 50);
+        sb.draw(Backdrop, (float) width /2 - (float) Backdrop.getWidth() / 2, height - (Backdrop.getHeight() + BUTTON_OFFSET));
         if (isAndr) {
 
             }
