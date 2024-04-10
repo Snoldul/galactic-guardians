@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.tdt4240gr18.game.DatabaseInterface;
 import com.tdt4240gr18.game.LeaderboardEntry;
 import com.tdt4240gr18.game.MenuButton;
 
@@ -13,7 +14,6 @@ import java.util.List;
 
 
 public class LeaderboardState extends State{
-    private final boolean isAndr;
     private final List<MenuButton> buttons;
     private final int width;
     public int height;
@@ -22,24 +22,25 @@ public class LeaderboardState extends State{
     private final BitmapFont font;
     private final Texture Backdrop;
     private final List<LeaderboardEntry> EntriesList;
+    DatabaseInterface databaseInterface;
+
     // TEMPORARY:
     LeaderboardEntry temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8, temp9, temp0;
 
 
 
 
-    protected LeaderboardState(GameStateManager gsm) {
+    protected LeaderboardState(GameStateManager gsm, DatabaseInterface databaseInterface) {
         super(gsm);
+        this.databaseInterface = databaseInterface;
+        databaseInterface.fetchDataFromDatabase();
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
-        isAndr = isAndroid();
         buttons = new ArrayList<>();
         EntriesList = new ArrayList<>();
         buttonOffsetY = 20;
         buttons.add(addButton("Back"));
-        if (isAndr) {
-            buttons.add(addButton("Log in"));
-        }
+        buttons.add(addButton("Log in"));
         this.font = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
         //this.bounds = new Rectangle(x, y, texture.getWidth(), texture.getHeight());
         Backdrop = new Texture("backdrop1x2.png");
@@ -72,16 +73,6 @@ public class LeaderboardState extends State{
         sortList((ArrayList<LeaderboardEntry>) EntriesList);
     }
 
-    private boolean isAndroid() {
-        try {
-            Class.forName("android.os.Build");
-            return true;
-        }
-        catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
-
     private MenuButton addButton(String text) {
         Texture buttonTexture = new Texture("menuBtn.png");
         float x = (float) (width - buttonTexture.getWidth()) / 2;
@@ -103,7 +94,7 @@ public class LeaderboardState extends State{
                 if (button.isClicked(touchX, touchY)) {
                     if (button.getButtonText().equals("Back")) {
                         // Burde egentlig bruke push og pop i stedet for set men får ikke til, skjermen blir bare svart etter å pop-e
-                        gsm.set(new MenuState(gsm));
+                        gsm.set(new MenuState(gsm, databaseInterface));
                         dispose();
                     }
                 }
@@ -125,9 +116,6 @@ public class LeaderboardState extends State{
         sb.begin();
         //this.layout = new GlyphLayout(font, buttonText);
         sb.draw(Backdrop, (float) width /2 - (float) Backdrop.getWidth() / 2, height - (Backdrop.getHeight() + buttonOffsetY));
-        if (isAndr) {
-            //My score - functionality
-            }
         for (MenuButton button : buttons) {
             button.render(sb);
         }

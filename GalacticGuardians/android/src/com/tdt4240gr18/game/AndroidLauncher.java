@@ -8,18 +8,19 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.firebase.FirebaseApp;
 
 public class AndroidLauncher extends AndroidApplication {
-	//Don't know if this can be local and/or final
-	private FirebaseManager firebaseManager;
+	private final AndroidDatabaseHandler databaseHandler = new AndroidDatabaseHandler();
 
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-		initialize(new GalacticGuardians(), config);
+		initialize(new GalacticGuardians(databaseHandler), config);
 
 		FirebaseApp.initializeApp(this);
 		// TEMPORARY, FOR TESTING UNTIL "FRONTEND" BUTTONS ARE IMPLEMENTED
-		firebaseManager = new FirebaseManager();
+		//Don't know if this can be local and/or final
+		FirebaseManager firebaseManager = new FirebaseManager();
 
 		String testEmail = "test@test.no";
 		String testPassword = "testPass123";

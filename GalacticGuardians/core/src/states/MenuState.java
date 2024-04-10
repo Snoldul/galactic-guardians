@@ -3,6 +3,7 @@ package states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.tdt4240gr18.game.DatabaseInterface;
 import com.tdt4240gr18.game.MenuButton;
 
 import java.util.ArrayList;
@@ -14,9 +15,11 @@ public class MenuState extends State{
     public int height;
     private final Texture logo;
     private final List<MenuButton> buttons;
+    private final DatabaseInterface databaseInterface;
 
-    public MenuState(GameStateManager gsm) {
+    public MenuState(GameStateManager gsm, DatabaseInterface databaseInterface) {
         super(gsm);
+        this.databaseInterface = databaseInterface;
         logo = new Texture("logo.png");
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
@@ -51,7 +54,7 @@ public class MenuState extends State{
                         dispose();
                     }
                     if (button.getButtonText().equals("Leaderboard")) {
-                        gsm.set(new LeaderboardState(gsm));
+                        gsm.set(new LeaderboardState(gsm, databaseInterface));
                         dispose();
                     }
                 }
