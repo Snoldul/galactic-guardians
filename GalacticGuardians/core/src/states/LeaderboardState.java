@@ -20,7 +20,6 @@ public class LeaderboardState extends State{
     private final int buttonOffsetY;
     private final int entryoffsetX, entryMargin;
     private final BitmapFont font;
-    //private final Rectangle bounds;
     private final Texture Backdrop;
     private final List<LeaderboardEntry> EntriesList;
     // TEMPORARY:

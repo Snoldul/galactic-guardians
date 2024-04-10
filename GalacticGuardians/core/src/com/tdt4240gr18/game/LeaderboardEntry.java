@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class LeaderboardEntry {
     private final String UserID;
     private int score;
-    private GlyphLayout layoutUID;
-    private GlyphLayout layoutScore;
 
     public LeaderboardEntry(String UserID, int score) {
         this.UserID = UserID;
@@ -16,14 +14,14 @@ public class LeaderboardEntry {
     }
 
     public void render(SpriteBatch sb, BitmapFont font, int x, int y, int boxWidth) {
-        layoutUID = new GlyphLayout(font, UserID);
-        layoutScore = new GlyphLayout(font, Integer.toString(score));
+        GlyphLayout layoutUID = new GlyphLayout(font, UserID);
+        GlyphLayout layoutScore = new GlyphLayout(font, Integer.toString(score));
         int xPos = 0;
         int UIDWidth = (int) layoutUID.width;
         int scoreWidth = (int) layoutScore.width;
         int dotWidth = font.getData().getGlyph('.').width * (int) font.getScaleX();
         StringBuilder textBuilder = new StringBuilder();
-        StringBuilder temptextBuilder = new StringBuilder();
+        //StringBuilder temptextBuilder = new StringBuilder();
 
         for (int i = dotWidth; i < boxWidth; i += dotWidth) {
             if (i > UIDWidth) {
