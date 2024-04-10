@@ -3,14 +3,12 @@ package states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.tdt4240gr18.game.LeaderboardEntry;
 import com.tdt4240gr18.game.MenuButton;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 
@@ -22,10 +20,9 @@ public class LeaderboardState extends State{
     private final int buttonOffsetY;
     private final int entryoffsetX, entryMargin;
     private final BitmapFont font;
-    private GlyphLayout layout;
     //private final Rectangle bounds;
     private final Texture Backdrop;
-    private List<LeaderboardEntry> EntriesList;
+    private final List<LeaderboardEntry> EntriesList;
     // TEMPORARY:
     LeaderboardEntry temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8, temp9, temp0;
 
@@ -94,12 +91,7 @@ public class LeaderboardState extends State{
     }
 
     private void sortList(ArrayList<LeaderboardEntry> list) {
-        Collections.sort(EntriesList, new Comparator<LeaderboardEntry>() {
-            @Override
-            public int compare(LeaderboardEntry t1, LeaderboardEntry t2) {
-                return t2.getScore() - t1.getScore();
-            }
-        });
+        Collections.sort(list, (t1, t2) -> t2.getScore() - t1.getScore());
     }
 
     @Override
@@ -135,7 +127,7 @@ public class LeaderboardState extends State{
         //this.layout = new GlyphLayout(font, buttonText);
         sb.draw(Backdrop, (float) width /2 - (float) Backdrop.getWidth() / 2, height - (Backdrop.getHeight() + buttonOffsetY));
         if (isAndr) {
-
+            //My score - functionality
             }
         for (MenuButton button : buttons) {
             button.render(sb);
