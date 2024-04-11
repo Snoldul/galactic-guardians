@@ -66,9 +66,8 @@ public class PlayState extends State {
     private void movePlayer(float xDirection, float yDirection) {
         VelocityComponent velocity = playerEntity.getComponent(VelocityComponent.class);
         if (velocity != null) {
-            float speed = 100; // Adjust this value to control player speed
+            float speed = 100; // Adjust to control player speed
             velocity.velocity.x = xDirection * speed;
-            // Assuming yDirection is not used since movement is only left/right
         }
     }
 
