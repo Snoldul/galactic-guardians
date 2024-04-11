@@ -1,17 +1,22 @@
 package com.tdt4240gr18.game;
 
+import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
+import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
+
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.uikit.UIApplication;
 
-import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
-import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
-import com.tdt4240gr18.game.GalacticGuardians;
-
 public class IOSLauncher extends IOSApplication.Delegate {
+    private final DatabaseInterface databaseInterface;
+
+    public IOSLauncher(DatabaseInterface databaseInterface) {
+        this.databaseInterface = databaseInterface;
+    }
+
     @Override
     protected IOSApplication createApplication() {
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-        return new IOSApplication(new GalacticGuardians(), config);
+        return new IOSApplication(new GalacticGuardians(databaseInterface), config);
     }
 
     public static void main(String[] argv) {
