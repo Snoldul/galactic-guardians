@@ -8,13 +8,20 @@ import states.GameStateManager;
 import states.MenuState;
 
 public class GalacticGuardians extends ApplicationAdapter {
+	private final DatabaseInterface databaseInterface;
 	private GameStateManager gsm;
 	private SpriteBatch batch;
+
+	public GalacticGuardians(DatabaseInterface databaseInterface) {
+		this.databaseInterface = databaseInterface;
+	}
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
+		//databaseInterface.fetchDataFromDatabase();
 		gsm = new GameStateManager();
-		gsm.push(new MenuState(gsm));
+		gsm.push(new MenuState(gsm, databaseInterface));
 	}
 
 	@Override

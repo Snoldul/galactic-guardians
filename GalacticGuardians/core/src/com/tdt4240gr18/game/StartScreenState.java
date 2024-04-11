@@ -7,9 +7,9 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
 public class StartScreenState implements GameStateInterface{
 
-    private GalacticGuardians game;
+    private final GalacticGuardians game;
 
-    private BitmapFont title = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
+    private final BitmapFont title = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
 
     public StartScreenState(GalacticGuardians game){
         this.game = game;
