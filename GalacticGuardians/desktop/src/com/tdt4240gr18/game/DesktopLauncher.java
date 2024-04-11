@@ -12,7 +12,7 @@ public class DesktopLauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(60);
 		config.setTitle("GalacticGuardians");
-		config.setWindowedMode(1200, 800);
-		new Lwjgl3Application(new GalacticGuardians(databaseInterface), config);
+		config.setWindowedMode(800, 1200);
+		new Lwjgl3Application(new GalacticGuardians(), config);
 	}
 }
