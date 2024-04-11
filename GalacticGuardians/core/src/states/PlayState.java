@@ -45,9 +45,9 @@ public class PlayState extends State {
 
         // Set component values
         float xPosition = Gdx.graphics.getWidth() / 2f;
-        float yPosition = 100f;
+        float yPosition = 170f;
         transform.position.set(xPosition, yPosition, 0);
-        transform.scale.set(5f,5f,5f);
+        transform.scale.set(7f,7f,7f);
         texture.region = new TextureRegion(new Texture(Gdx.files.internal("Player.png")));
 
         // Add components to player entity
