@@ -33,11 +33,23 @@ public class RenderingSystem extends SortedIteratingSystem {
         batch.begin();
         for (Entity entity : renderQueue) {
             TextureComponent tex = tm.get(entity);
-            TransformComponent pos = trm.get(entity);
+            TransformComponent transform = trm.get(entity);
+
             if (tex.region == null) {
                 continue;
             }
-            batch.draw(tex.region, pos.position.x, pos.position.y);
+
+            float width = tex.region.getRegionWidth();
+            float height = tex.region.getRegionHeight();
+            float originX = width / 2f; // Typically, the origin is set to the center for rotation
+            float originY = height / 2f;
+
+            batch.draw(tex.region,
+                    transform.position.x - originX, transform.position.y - originY, // Drawing position adjusted for origin
+                    originX, originY, // Origin for rotation and scaling
+                    width, height, // Width and height of the texture region
+                    transform.scale.x, transform.scale.y, // Scale X, Scale Y
+                    transform.rotation.z); // Rotation around the Z axis, assuming degrees
         }
         batch.end();
         renderQueue.clear();
