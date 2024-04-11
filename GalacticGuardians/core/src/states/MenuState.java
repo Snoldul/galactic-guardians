@@ -3,6 +3,7 @@ package states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.tdt4240gr18.game.DatabaseInterface;
 import com.tdt4240gr18.game.MenuButton;
 
 import java.util.ArrayList;
@@ -10,32 +11,34 @@ import java.util.List;
 
 public class MenuState extends State{
     private final float BUTTON_OFFSET;
-    private int width;
+    private final int width;
     public int height;
-    private Texture logo;
-    private List<MenuButton> buttons;
+    private final Texture logo;
+    private final List<MenuButton> buttons;
+    private final DatabaseInterface databaseInterface;
 
-    public MenuState(GameStateManager gsm) {
+    public MenuState(GameStateManager gsm, DatabaseInterface databaseInterface) {
         super(gsm);
+        this.databaseInterface = databaseInterface;
         logo = new Texture("logo.png");
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
         buttons = new ArrayList<>();
         BUTTON_OFFSET = 20;
-        addButton("Start");
-        addButton("Leaderboard");
-        addButton("Options");
-        addButton("Quit");
-
+        buttons.add(addButton("Start"));
+        buttons.add(addButton("Leaderboard"));
+        buttons.add(addButton("Options"));
+        buttons.add(addButton("Quiit"));
     }
 
-    private void addButton(String text) {
+    private MenuButton addButton(String text) {
         Texture buttonTexture = new Texture("menuBtn.png");
         float x = (float) (width - buttonTexture.getWidth()) / 2;
         float y = ((float) height / 2) * 0.7f - buttons.size() * (buttonTexture.getHeight() + BUTTON_OFFSET);
-        MenuButton button = new MenuButton(buttonTexture, text, x, y);
-        buttons.add(button);
+        return new MenuButton(buttonTexture, text, x, y);
     }
+
+
 
     @Override
     public void handleInput() {
@@ -45,8 +48,13 @@ public class MenuState extends State{
 
             for (MenuButton button : buttons) {
                 if (button.isClicked(touchX, touchY)) {
+                    // Burde egentlig bruke push og pop i stedet for set men får ikke til, skjermen blir bare svart etter å pop-e
                     if (button.getButtonText().equals("Start")) {
                         gsm.set(new PlayState(gsm));
+                        dispose();
+                    }
+                    if (button.getButtonText().equals("Leaderboard")) {
+                        gsm.set(new LeaderboardState(gsm, databaseInterface));
                         dispose();
                     }
                 }

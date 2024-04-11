@@ -8,12 +8,11 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 public class MenuButton {
-    private Texture buttonTexture;
-    private Rectangle bounds;
-    private BitmapFont font;
+    private final Texture buttonTexture;
+    private final Rectangle bounds;
+    private final BitmapFont font;
     private GlyphLayout layout;
-    private String buttonText;
-    private float textScale;
+    private final String buttonText;
 
 
     public MenuButton(Texture texture, String text, float x, float y) {
@@ -21,7 +20,7 @@ public class MenuButton {
         this.bounds = new Rectangle(x, y, texture.getWidth(), texture.getHeight());
         this.font = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
         this.buttonText = text;
-        textScale = 2;
+        float textScale = 2;
         font.getData().setScale(textScale);
 
     }

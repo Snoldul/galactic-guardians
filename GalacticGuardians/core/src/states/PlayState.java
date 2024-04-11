@@ -19,9 +19,9 @@ import com.tdt4240gr18.game.entity.components.TextureComponent;
 
 
 public class PlayState extends State {
-    private BitmapFont title = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
-    private PooledEngine engine = new PooledEngine();
-    private Texture player;
+    private final BitmapFont title = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
+    private final PooledEngine engine = new PooledEngine();
+    private final Texture player;
 
     private Entity playerEntity;
 
