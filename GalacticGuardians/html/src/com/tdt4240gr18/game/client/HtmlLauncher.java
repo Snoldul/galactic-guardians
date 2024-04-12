@@ -7,8 +7,16 @@ import com.tdt4240gr18.game.DatabaseInterface;
 import com.tdt4240gr18.game.GalacticGuardians;
 
 public class HtmlLauncher extends GwtApplication {
-        private final DatabaseInterface databaseInterface = () -> {
+        private final DatabaseInterface databaseInterface = new DatabaseInterface() {
+            @Override
+            public void fetchDataFromDatabase() {
 
+            }
+
+            @Override
+            public void insertTestData() {
+
+            }
         };
 
         @Override
