@@ -7,6 +7,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
@@ -16,16 +17,14 @@ public class PlayerControlSystem extends IteratingSystem {
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
 
     // Define movement areas for touch input
-    private Rectangle leftMoveArea;
-    private Rectangle rightMoveArea;
-    private float speed = 150; // Value to control player speed
+    private Rectangle MoveArea;
+    private float speed = 10; // Value to control player speed
 
     public PlayerControlSystem() {
         super(Family.all(TransformComponent.class, VelocityComponent.class).get());
 
-        // Initialize movement areas
-        leftMoveArea = new Rectangle(0, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
-        rightMoveArea = new Rectangle(Gdx.graphics.getWidth() / 2, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+        // Initialize movement area
+        MoveArea = new Rectangle(10, 10, Gdx.graphics.getWidth()-10, Gdx.graphics.getHeight()/4f);
     }
 
     @Override
@@ -37,13 +36,25 @@ public class PlayerControlSystem extends IteratingSystem {
             Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             touchPos.y = Gdx.graphics.getHeight() - touchPos.y; // Adjust for y-coordinate flip
 
-            for (Entity entity : getEntities()) {
-                VelocityComponent velocity = vm.get(entity);
+            // Check if touch input is within movement area
+            if (MoveArea.contains(touchPos.x, touchPos.y)) {
 
-                if (leftMoveArea.contains(touchPos.x, touchPos.y)) {
-                    velocity.velocity.x = -speed;
-                } else if (rightMoveArea.contains(touchPos.x, touchPos.y)) {
-                    velocity.velocity.x = speed;
+                for (Entity entity : getEntities()) {
+                    // Get components
+                    VelocityComponent velocity = vm.get(entity);
+                    TransformComponent transform = pm.get(entity);
+
+                    // Calculate movement direction
+                    Vector2 touchCenter = new Vector2(MoveArea.x + MoveArea.width / 2f, MoveArea.y + MoveArea.height / 2f);
+                    Vector2 moveCenter = new Vector2(Gdx.graphics.getWidth() / 2f, (Gdx.graphics.getHeight() / 2f) - 200);
+                    Vector2 direction = new Vector2(touchPos.x - touchCenter.x, touchPos.y - touchCenter.y);
+
+                    // Calculate target position
+                    Vector2 target = new Vector2(moveCenter.x + direction.x, moveCenter.y + direction.y);
+
+                    // Set velocity to move towards target
+                    velocity.velocity.x = (target.x - transform.position.x) * speed;
+                    velocity.velocity.y = (target.y - transform.position.y) * speed;
                 }
             }
         } else {
