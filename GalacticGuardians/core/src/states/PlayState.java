@@ -22,13 +22,14 @@ public class PlayState extends State {
     private final BitmapFont title = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
     private final PooledEngine engine = new PooledEngine();
     private final Texture player;
-
+    private final Texture movementSpace;
     private Entity playerEntity;
 
 
     public PlayState(GameStateManager gsm){
         super(gsm);
         player = new Texture("Player.png");
+        movementSpace = new Texture("backdrop.png");
         SpriteBatch sb = new SpriteBatch();
         engine.addSystem(new PlayerControlSystem());
         engine.addSystem(new MovementSystem());
@@ -45,7 +46,7 @@ public class PlayState extends State {
 
         // Set component values
         float xPosition = Gdx.graphics.getWidth() / 2f;
-        float yPosition = 170f;
+        float yPosition = (Gdx.graphics.getHeight() / 3f)-100;
         transform.position.set(xPosition, yPosition, 0);
         transform.scale.set(7f,7f,7f);
         texture.region = new TextureRegion(new Texture(Gdx.files.internal("Player.png")));
@@ -81,6 +82,7 @@ public class PlayState extends State {
     @Override
     public void render(SpriteBatch sb) {
         sb.begin();
+        sb.draw(movementSpace, 10, 10, Gdx.graphics.getWidth()-10, Gdx.graphics.getHeight()/4f);
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
         engine.update(Gdx.graphics.getDeltaTime());
