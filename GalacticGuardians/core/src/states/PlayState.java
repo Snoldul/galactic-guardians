@@ -1,5 +1,6 @@
 package states;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
@@ -10,7 +11,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.tdt4240gr18.game.entity.components.BulletComponent;
 import com.tdt4240gr18.game.entity.systems.BulletControlSystem;
+import com.tdt4240gr18.game.entity.components.EnemyComponent;
 import com.tdt4240gr18.game.entity.components.LivesComponent;
 import com.tdt4240gr18.game.entity.components.PlayerComponent;
 import com.tdt4240gr18.game.entity.systems.EnemyControlSystem;
@@ -24,22 +27,27 @@ import com.tdt4240gr18.game.entity.components.TextureComponent;
 
 
 public class PlayState extends State {
+
+    private ComponentMapper<TransformComponent> pm = ComponentMapper.getFor(TransformComponent.class);
     private final BitmapFont title = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
     private final PooledEngine engine = new PooledEngine();
     private final Texture player;
     private final Texture enemy;
+    private final Texture bullet;
     private final Texture movementSpace;
     private SpriteBatch sb;
     private Entity playerEntity;
 
     private Entity bulletEntity;
     private float spawnTimer;
+    private float shotTimer;
 
 
     public PlayState(GameStateManager gsm){
         super(gsm);
         player = new Texture("Player.png");
         enemy = new Texture("Enemy.png");
+        bullet = new Texture("pew.png");
         movementSpace = new Texture("backdrop.png");
         sb = new SpriteBatch();
         engine.addSystem(new PlayerControlSystem());
@@ -81,6 +89,7 @@ public class PlayState extends State {
         VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
         TextureComponent texture = engine.createComponent(TextureComponent.class);
         LivesComponent lives = engine.createComponent(LivesComponent.class);
+        EnemyComponent enemyCmp = engine.createComponent(EnemyComponent.class);
 
         // Set component values
         transform.position.set(x, y, 0);
@@ -93,6 +102,7 @@ public class PlayState extends State {
         enemyEntity.add(velocity);
         enemyEntity.add(texture);
         enemyEntity.add(lives);
+        enemyEntity.add(enemyCmp);
 
         // Add the entity to the engine
         engine.addEntity(enemyEntity);
@@ -103,18 +113,20 @@ public class PlayState extends State {
         TransformComponent transform = engine.createComponent(TransformComponent.class);
         VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
         TextureComponent texture = engine.createComponent(TextureComponent.class);
+        BulletComponent bulletCmp = engine.createComponent(BulletComponent.class);
+
+        TransformComponent playerTransform = pm.get(playerEntity);
 
         // Set component values
-        float xPosition = Gdx.graphics.getWidth() / 2f;
-        float yPosition = 270f;
-        transform.position.set(xPosition, yPosition, 0);
+        transform.position.set(playerTransform.position.x, playerTransform.position.y+50, 0);
         transform.scale.set(7f,7f,7f);
-        texture.region = new TextureRegion(new Texture(Gdx.files.internal("Player.png")));
+        texture.region = new TextureRegion(bullet);
 
         // Add components to player entity
         bulletEntity.add(transform);
         bulletEntity.add(velocity);
         bulletEntity.add(texture);
+        bulletEntity.add(bulletCmp);
 
         // Add the entity to the engine
         engine.addEntity(bulletEntity);
@@ -132,26 +144,23 @@ public class PlayState extends State {
         }
     }
 
-    private void moveBullet(float xDirection, float yDirection) {
-        VelocityComponent velocity = bulletEntity.getComponent(VelocityComponent.class);
-        if (velocity != null) {
-            float speed = 600; // Adjust to control player speed
-            velocity.velocity.y = yDirection * speed;
-        }
-    }
-
     @Override
     public void update(float dt) {
         if(!Gdx.input.isTouched()){
          movePlayer(0, 0);
         }
-        moveBullet(0, 1);
+        shotTimer += dt;
         spawnTimer += dt;
         if(spawnTimer >= 2){
          float x = MathUtils.random(0, Gdx.graphics.getWidth());
             float y = Gdx.graphics.getHeight();
             createEnemy(x, y);
             spawnTimer = 0;
+        }
+
+        if (shotTimer >= 0.5){
+            createBullet();
+            shotTimer = 0;
         }
         engine.update(dt);
     }
