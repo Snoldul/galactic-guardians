@@ -31,13 +31,18 @@ public class Option {
     }
     public void render(SpriteBatch sb){
         this.layout = new GlyphLayout(font, name);
-        float buttonSize = bounds.height * 0.6f;
-        float startX = bounds.x + buttonSize;
+        float buttonSize = bounds.height * 0.65f;
+
+        float textX = bounds.x;
         float centerY = bounds.y + bounds.height / 2;
-        float imageX = bounds.x + bounds.width - 3 * buttonSize;
-        sb.draw(isOn ? onTexture : offTexture, imageX, centerY - buttonSize / 2, buttonSize, buttonSize);
-        font.draw(sb, layout, startX, centerY + layout.height / 2);
+        float textY = centerY + layout.height / 2;
+        float imageX = bounds.x + bounds.width - buttonSize;
+        float imageY = bounds.y + (bounds.height - buttonSize) / 2;
+
+        sb.draw(isOn ? onTexture : offTexture, imageX, imageY, buttonSize, buttonSize);
+        font.draw(sb, layout, textX, textY);
     }
+
 
     public boolean contains(float x, float y) {
         return bounds.contains(x, y);
