@@ -9,6 +9,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.tdt4240gr18.game.entity.components.PlayerComponent;
 import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
 
@@ -21,7 +22,7 @@ public class PlayerControlSystem extends IteratingSystem {
     private float speed = 10; // Value to control player speed
 
     public PlayerControlSystem() {
-        super(Family.all(TransformComponent.class, VelocityComponent.class).get());
+        super(Family.all(TransformComponent.class, VelocityComponent.class, PlayerComponent.class).get());
 
         // Initialize movement area
         MoveArea = new Rectangle(10, 10, Gdx.graphics.getWidth()-10, Gdx.graphics.getHeight()/4f);
