@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.tdt4240gr18.game.entity.components.EnemyComponent;
 import com.tdt4240gr18.game.entity.components.LivesComponent;
 import com.tdt4240gr18.game.entity.components.PlayerComponent;
 import com.tdt4240gr18.game.entity.systems.EnemyControlSystem;
@@ -77,6 +78,7 @@ public class PlayState extends State {
         VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
         TextureComponent texture = engine.createComponent(TextureComponent.class);
         LivesComponent lives = engine.createComponent(LivesComponent.class);
+        EnemyComponent enemyCmp = engine.createComponent(EnemyComponent.class);
 
         // Set component values
         transform.position.set(x, y, 0);
@@ -89,6 +91,7 @@ public class PlayState extends State {
         enemyEntity.add(velocity);
         enemyEntity.add(texture);
         enemyEntity.add(lives);
+        enemyEntity.add(enemyCmp);
 
         // Add the entity to the engine
         engine.addEntity(enemyEntity);

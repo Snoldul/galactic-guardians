@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
+import com.tdt4240gr18.game.entity.components.EnemyComponent;
 import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
 
@@ -14,7 +15,7 @@ public class EnemyControlSystem extends IteratingSystem {
 
     public EnemyControlSystem() {
         // Specify that this system uses entities with both Transform and Velocity components
-        super(Family.all(TransformComponent.class, VelocityComponent.class).get());
+        super(Family.all(TransformComponent.class, VelocityComponent.class, EnemyComponent.class).get());
     }
 
     @Override
