@@ -76,15 +76,29 @@ public class OptionsState extends State{
         float xButtonY = (height - menuPosY - newHeight) + xBtnHeight;
         xBtnBounds = new Rectangle(xButtonX, xButtonY, xBtnWidth, xBtnHeight);
     }
-    public void addOption(String name) {
+    public void addOption(String text) {
+        Rectangle optionBounds = calculateOptionBounds();
+        Rectangle buttonBounds = calculateButtonBounds(optionBounds);
+        options.add(new Option(text, onTexture, offTexture, optionBounds, buttonBounds));
+    }
+
+    private Rectangle calculateOptionBounds(){
         // Space from top of screen to first option
         float additionalOffset = 400f;
         float optionHeight = height * 0.1f;
         float optionWidth = (float) optionsMenu.getWidth();
         float optionY = menuPosY + newHeight - (options.size() + 1) * (optionHeight + OPTION_OFFSET) - additionalOffset;
         float optionX = menuPosX + (newWidth-optionWidth)/2;
-        Rectangle bounds = new Rectangle(optionX, optionY, optionWidth, optionHeight);
-        options.add(new Option(name, onTexture, offTexture, bounds));
+        return new Rectangle(optionX, optionY, optionWidth, optionHeight);
+    }
+
+    private Rectangle calculateButtonBounds(Rectangle optionBounds){
+        float scaleButton = 0.65f;
+        float buttonWidth = onTexture.getWidth() * scaleButton;
+        float buttonHeight = offTexture.getHeight() * scaleButton;
+        float imageX = optionBounds.x + optionBounds.width - buttonWidth;
+        float imageY = optionBounds.y + (optionBounds.height - buttonHeight) / 2;
+        return new Rectangle(imageX, imageY, buttonWidth, buttonHeight);
     }
 
     @Override
@@ -98,7 +112,16 @@ public class OptionsState extends State{
             for (Option option : options){
                 // If the touch was within the option bounds, toggle the option
                 if (option.contains(x,y)){
-                    option.toggle();
+                    if (option.getOptionText().equals("Music")) {
+                        option.toggle();
+                    }
+                    if (option.getOptionText().equals("Sound")) {
+                        option.toggle();
+                    }
+                    if (option.getOptionText().equals("Tutorial")) {
+                        option.toggle();
+                    }
+
                 }
             }
         }
