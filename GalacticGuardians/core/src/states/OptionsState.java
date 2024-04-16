@@ -27,9 +27,8 @@ public class OptionsState extends State{
     private int height;
     private float newHeight;
     private float newWidth;
-    private float x;
-    private float y;
-    private float optionHeight;
+    private float menuPosX;
+    private float menuPosY;
     private Texture onTexture;
     private Texture offTexture;
 
@@ -54,9 +53,9 @@ public class OptionsState extends State{
         height = Gdx.graphics.getHeight();
         newWidth = width * 0.95f;
         newHeight = ((float) optionsMenu.getHeight() / (float) optionsMenu.getWidth()) * newWidth;
-        x = (width - newWidth) / 2;
-        y = (height - newHeight) / 2 + height * 0.05f;
-        optionHeight = height * 0.1f;
+        // X and Y pos of optionsMenu
+        menuPosX = (width - newWidth) / 2;
+        menuPosY = (height - newHeight) / 2 + height * 0.05f;
     }
 
     private void initializeFont(){
@@ -74,13 +73,17 @@ public class OptionsState extends State{
         float xBtnWidth = width * 0.15f;
         float xBtnHeight = xBtnWidth;
         float xButtonX = (width - xBtnWidth) / 2;
-        float xButtonY = (height - y - newHeight) + xBtnHeight;
+        float xButtonY = (height - menuPosY - newHeight) + xBtnHeight;
         xBtnBounds = new Rectangle(xButtonX, xButtonY, xBtnWidth, xBtnHeight);
     }
     public void addOption(String name) {
-        float additionalOffset = 350f;
-        float optionY = y + newHeight - (options.size() + 1) * (optionHeight + OPTION_OFFSET) - additionalOffset;
-        Rectangle bounds = new Rectangle(x, optionY, width, optionHeight);
+        // Space from top of screen to first option
+        float additionalOffset = 400f;
+        float optionHeight = height * 0.1f;
+        float optionWidth = (float) optionsMenu.getWidth();
+        float optionY = menuPosY + newHeight - (options.size() + 1) * (optionHeight + OPTION_OFFSET) - additionalOffset;
+        float optionX = menuPosX + (newWidth-optionWidth)/2;
+        Rectangle bounds = new Rectangle(optionX, optionY, optionWidth, optionHeight);
         options.add(new Option(name, onTexture, offTexture, bounds));
     }
 
@@ -93,6 +96,7 @@ public class OptionsState extends State{
                 gsm.pop();
             }
             for (Option option : options){
+                // If the touch was within the option bounds, toggle the option
                 if (option.contains(x,y)){
                     option.toggle();
                 }
@@ -116,7 +120,7 @@ public class OptionsState extends State{
     }
 
     private void renderOptionsMenu(SpriteBatch sb){
-        sb.draw(optionsMenu,x, y, newWidth, newHeight);
+        sb.draw(optionsMenu,menuPosX, menuPosY, newWidth, newHeight);
         sb.draw(xBtn, xBtnBounds.x, xBtnBounds.y, xBtnBounds.width, xBtnBounds.height);
     }
 
@@ -124,8 +128,8 @@ public class OptionsState extends State{
         layout = new GlyphLayout(fontTitle, TITLE_TEXT);
         float titleWidth = layout.width;
         float titleHeight = layout.height;
-        float titleX = x + ((newWidth - titleWidth) / 2);
-        float titleY = y + newHeight - titleHeight - newHeight * 0.02f;
+        float titleX = menuPosX + ((newWidth - titleWidth) / 2);
+        float titleY = menuPosY + newHeight - titleHeight - newHeight * 0.02f;
         fontTitle.draw(sb, layout, titleX, titleY);
     }
     private void renderOptions(SpriteBatch sb){
