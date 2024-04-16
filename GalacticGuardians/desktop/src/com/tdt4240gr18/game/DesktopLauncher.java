@@ -7,20 +7,30 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		DatabaseInterface databaseInterface = new DatabaseInterface() {
-			@Override
-			public void fetchDataFromDatabase() {
 
+			@Override
+			public void getAllEntries(OnDataLoadedCallback callback) {
 			}
 
 			@Override
-			public void insertTestData() {
+			public void getEntriesPerPage(int pageNumber, int entriesPerPage, OnDataLoadedCallback callback) {
+			}
+
+			@Override
+			public LeaderboardEntry getEntry(String username) {
+				return null;
+			}
+
+			@Override
+			public void addScoreToLeaderboard(String username, int score) {
 
 			}
+
 		};
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(60);
 		config.setTitle("GalacticGuardians");
-		config.setWindowedMode(800, 1200);
+		config.setWindowedMode(1080 / 3, 2400 / 3);
 		new Lwjgl3Application(new GalacticGuardians(databaseInterface), config);
 	}
 }

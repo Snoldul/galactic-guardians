@@ -4,19 +4,23 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import java.util.Objects;
+
 public class LeaderboardEntry {
-    private final String UserID;
+    private final String username;
     private int score;
 
-    public LeaderboardEntry(String UserID, int score) {
-        this.UserID = UserID;
+    public LeaderboardEntry(String username, int score) {
+        this.username = username;
         setScore(score);
     }
 
-    public void render(SpriteBatch sb, BitmapFont font, int x, int y, int boxWidth, int position) {
-        GlyphLayout layoutUID = new GlyphLayout(font, UserID);
+    public void render(SpriteBatch sb, BitmapFont font, int x, int y, int boxWidth, int rank) {
+        GlyphLayout layoutUID = new GlyphLayout(font, username);
         GlyphLayout layoutScore = new GlyphLayout(font, Integer.toString(score));
-        GlyphLayout layoutPos = new GlyphLayout(font, position + ". ");
+        // Gdx.app.log("scoreWidth", Integer.toString((int) layoutScore.width));
+
+        GlyphLayout layoutPos = new GlyphLayout(font, rank + ". ");
         int xPos = 0;
         boolean posReached = false;
         int UIDWidth = (int) layoutUID.width;
@@ -51,9 +55,23 @@ public class LeaderboardEntry {
         font.draw(sb, layoutScore, x + boxWidth - scoreWidth, y);
     }
 
-    public String getUserID() {
-        return UserID;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        LeaderboardEntry that = (LeaderboardEntry) obj;
+        return Objects.equals(username, that.username);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username);
+    }
+
     public int getScore() {
         return score;
     }
