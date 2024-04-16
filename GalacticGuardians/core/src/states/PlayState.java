@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.tdt4240gr18.game.entity.systems.BulletControlSystem;
 import com.tdt4240gr18.game.entity.systems.PlayerControlSystem;
 import com.tdt4240gr18.game.entity.systems.MovementSystem;
 import com.tdt4240gr18.game.entity.systems.RenderingSystem;
@@ -25,15 +26,19 @@ public class PlayState extends State {
 
     private Entity playerEntity;
 
+    private Entity bulletEntity;
+
 
     public PlayState(GameStateManager gsm){
         super(gsm);
         player = new Texture("Player.png");
         SpriteBatch sb = new SpriteBatch();
         engine.addSystem(new PlayerControlSystem());
+        engine.addSystem(new BulletControlSystem());
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderingSystem(sb));
         createPlayer();
+        createBullet();
     }
 
     private void createPlayer(){
@@ -59,6 +64,28 @@ public class PlayState extends State {
         engine.addEntity(playerEntity);
     }
 
+    private void createBullet(){
+        bulletEntity = engine.createEntity();
+        TransformComponent transform = engine.createComponent(TransformComponent.class);
+        VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
+        TextureComponent texture = engine.createComponent(TextureComponent.class);
+
+        // Set component values
+        float xPosition = Gdx.graphics.getWidth() / 2f;
+        float yPosition = 270f;
+        transform.position.set(xPosition, yPosition, 0);
+        transform.scale.set(7f,7f,7f);
+        texture.region = new TextureRegion(new Texture(Gdx.files.internal("Player.png")));
+
+        // Add components to player entity
+        bulletEntity.add(transform);
+        bulletEntity.add(velocity);
+        bulletEntity.add(texture);
+
+        // Add the entity to the engine
+        engine.addEntity(bulletEntity);
+    }
+
     @Override
     protected void handleInput() {
 
@@ -71,11 +98,21 @@ public class PlayState extends State {
         }
     }
 
+    private void moveBullet(float xDirection, float yDirection) {
+        VelocityComponent velocity = bulletEntity.getComponent(VelocityComponent.class);
+        if (velocity != null) {
+            float speed = 600; // Adjust to control player speed
+            velocity.velocity.y = yDirection * speed;
+        }
+    }
+
     @Override
     public void update(float dt) {
-     if(!Gdx.input.isTouched()){
+        if(!Gdx.input.isTouched()){
          movePlayer(0, 0);
-     }
+        }
+
+        moveBullet(0, 1);
     }
 
     @Override
