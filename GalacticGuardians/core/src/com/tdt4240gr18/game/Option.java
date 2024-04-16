@@ -8,17 +8,19 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Option {
-    private String name;
-    private Rectangle bounds;
+    private String optionText;
+    private Rectangle optionBounds;
+    private Rectangle buttonBounds;
     private boolean isOn;
     private Texture onTexture;
     private Texture offTexture;
     private BitmapFont font;
     private GlyphLayout layout;
 
-    public Option(String name, Texture onTexture, Texture offTexture, Rectangle bounds){
-        this.name = name;
-        this.bounds = bounds;
+    public Option(String optionText, Texture onTexture, Texture offTexture, Rectangle optionBounds, Rectangle buttonBounds){
+        this.optionText = optionText;
+        this.optionBounds = optionBounds;
+        this.buttonBounds = buttonBounds;
         this.isOn = true;
         font = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
         this.onTexture = onTexture;
@@ -30,22 +32,21 @@ public class Option {
         isOn = !isOn;
     }
     public void render(SpriteBatch sb){
-        this.layout = new GlyphLayout(font, name);
-        float buttonSize = bounds.height * 0.65f;
-
-        float textX = bounds.x;
-        float centerY = bounds.y + bounds.height / 2;
+        this.layout = new GlyphLayout(font, optionText);
+        float textX = optionBounds.x;
+        float centerY = optionBounds.y + optionBounds.height / 2;
         float textY = centerY + layout.height / 2;
-        float imageX = bounds.x + bounds.width - buttonSize;
-        float imageY = bounds.y + (bounds.height - buttonSize) / 2;
 
-        sb.draw(isOn ? onTexture : offTexture, imageX, imageY, buttonSize, buttonSize);
+        sb.draw(isOn ? onTexture : offTexture, buttonBounds.x, buttonBounds.y, buttonBounds.getWidth(), buttonBounds.getHeight());
         font.draw(sb, layout, textX, textY);
     }
 
 
     public boolean contains(float x, float y) {
-        return bounds.contains(x, y);
+        return buttonBounds.contains(x, y);
+    }
+    public String getOptionText() {
+        return optionText;
     }
 
     public void dispose(){
