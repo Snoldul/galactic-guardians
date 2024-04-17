@@ -12,10 +12,11 @@ import com.tdt4240gr18.game.ggTexture;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OptionsState extends State{
+public class RegisterUserState  extends State{
+
     private static final float OPTION_OFFSET = 1.5f;
     private static final float TEXT_SCALE = 3f;
-    private static final String TITLE_TEXT = "Options";
+    private static final String TITLE_TEXT = "Log in";
 
     private BitmapFont fontTitle;
     private final List<Option> options = new ArrayList<>();
@@ -33,7 +34,7 @@ public class OptionsState extends State{
     private Texture onTexture;
     private Texture offTexture;
 
-    public OptionsState(GameStateManager gsm) {
+    public RegisterUserState(GameStateManager gsm) {
         super(gsm);
         initializeTextures();
         initializeDimensions();
@@ -79,6 +80,7 @@ public class OptionsState extends State{
         float xButtonY = menuPosY - xBtnHeight / 2;
         xBtnBounds = new Rectangle(xButtonX, xButtonY, xBtnWidth, xBtnHeight);
     }
+
     public void addOption(String text) {
         Rectangle optionBounds = calculateOptionBounds();
         Rectangle buttonBounds = calculateButtonBounds(optionBounds);
@@ -89,7 +91,7 @@ public class OptionsState extends State{
         // Space from top of screen to first option
         float additionalOffset = 0.25f * menuHeight;
         float optionWidth = menuWidth * 0.8f;
-        float optionHeight = onTexture.getHeight() * 1.5f;
+        float optionHeight = onTexture.getHeight();
         float optionX = menuPosX + (menuWidth - optionWidth) / 2;
         float optionY = menuPosY + menuHeight - (options.size() + 1) * (optionHeight * OPTION_OFFSET) - additionalOffset;
         return new Rectangle(optionX, optionY, optionWidth, optionHeight);
