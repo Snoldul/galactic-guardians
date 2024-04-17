@@ -5,7 +5,10 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.tdt4240gr18.game.entity.components.CollisionComponent;
 import com.tdt4240gr18.game.entity.components.EnemyComponent;
+import com.tdt4240gr18.game.entity.components.LivesComponent;
 import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
 
@@ -15,11 +18,12 @@ public class EnemyControlSystem extends IteratingSystem {
 
     public EnemyControlSystem() {
         // Specify that this system uses entities with both Transform and Velocity components
-        super(Family.all(TransformComponent.class, VelocityComponent.class, EnemyComponent.class).get());
+        super(Family.all(EnemyComponent.class).get());
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
+
         TransformComponent pos = pm.get(entity);
         VelocityComponent vel = vm.get(entity);
 
@@ -34,5 +38,12 @@ public class EnemyControlSystem extends IteratingSystem {
 
         // Update position based on velocity
         pos.position.add(vel.velocity.x * deltaTime, vel.velocity.y * deltaTime, 0);
+
+        // Update collisionComponent position
+        TransformComponent transform = entity.getComponent(TransformComponent.class);
+        CollisionComponent bulletCollision = entity.getComponent(CollisionComponent.class);
+        Rectangle bounds = (Rectangle) bulletCollision.bounds;
+        bounds.x = transform.position.x;
+        bounds.y = transform.position.y;
     }
 }
