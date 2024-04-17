@@ -30,7 +30,7 @@ public class EnemyControlSystem extends IteratingSystem {
         // Specify that this system uses entities with both Transform and Velocity components
         super(Family.all(EnemyComponent.class).get());
         this.engine = engine;
-        bullet = new Texture("pew1.png");
+        bullet = new Texture("pew2.png");
     }
 
     @Override
@@ -58,8 +58,8 @@ public class EnemyControlSystem extends IteratingSystem {
         bounds.x = transform.position.x;
         bounds.y = transform.position.y;
 
-        // Shoot
-        if (MathUtils.random() < 0.01) {
+        // Shoots somewhat randomly
+        if (MathUtils.random() < 0.004) {
             // Creating a bullet
             Entity bulletEntity = engine.createEntity();
             TransformComponent bulletTransform = engine.createComponent(TransformComponent.class);
@@ -71,7 +71,7 @@ public class EnemyControlSystem extends IteratingSystem {
             TransformComponent enemyTransform = pm.get(entity);
 
             // Set component values
-            bulletCmp.speed = -300;
+            bulletCmp.speed = -200;
 
             CollisionComponent collisionComponent = entity.getComponent(CollisionComponent.class);
             Rectangle enemyBounds = (Rectangle) collisionComponent.bounds;

@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.tdt4240gr18.game.entity.components.CollisionComponent;
 import com.tdt4240gr18.game.entity.components.PlayerComponent;
+import com.tdt4240gr18.game.entity.components.TextureComponent;
 import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
 
@@ -83,9 +84,10 @@ public class PlayerControlSystem extends IteratingSystem {
 
         // Update collisionComponent position
         TransformComponent transform = entity.getComponent(TransformComponent.class);
+        TextureComponent texture = entity.getComponent(TextureComponent.class);
         CollisionComponent bulletCollision = entity.getComponent(CollisionComponent.class);
         Rectangle bounds = (Rectangle) bulletCollision.bounds;
-        bounds.x = transform.position.x;
+        bounds.x = transform.position.x - ((float) texture.region.getRegionWidth() * transform.scale.x)/2;
         bounds.y = transform.position.y;
     }
 }

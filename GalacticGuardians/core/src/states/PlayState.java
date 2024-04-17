@@ -18,6 +18,7 @@ import com.tdt4240gr18.game.entity.components.EnemyComponent;
 import com.tdt4240gr18.game.entity.components.LivesComponent;
 import com.tdt4240gr18.game.entity.components.PlayerComponent;
 import com.tdt4240gr18.game.entity.systems.EnemyControlSystem;
+import com.tdt4240gr18.game.entity.systems.ExplosionSystem;
 import com.tdt4240gr18.game.entity.systems.PlayerControlSystem;
 import com.tdt4240gr18.game.entity.systems.MovementSystem;
 import com.tdt4240gr18.game.entity.systems.RenderingSystem;
@@ -58,6 +59,7 @@ public class PlayState extends State {
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderingSystem(sb));
         engine.addSystem(new EnemyControlSystem(engine));
+        engine.addSystem(new ExplosionSystem(engine));
         createPlayer();
         createBullet();
     }
@@ -81,7 +83,7 @@ public class PlayState extends State {
         texture.region = new TextureRegion(player);
         lives.lives = 3;
 
-        collision.bounds = new Rectangle(xPosition, yPosition, player.getWidth()*scale, player.getHeight()*scale);
+        collision.bounds = new Rectangle(1, 1, player.getWidth()*scale, player.getHeight()*scale/2);
 
 
         // Add components to player entity
