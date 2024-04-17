@@ -57,7 +57,7 @@ public class PlayState extends State {
         engine.addSystem(new BulletControlSystem(engine));
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderingSystem(sb));
-        engine.addSystem(new EnemyControlSystem());
+        engine.addSystem(new EnemyControlSystem(engine));
         createPlayer();
         createBullet();
     }
@@ -69,18 +69,28 @@ public class PlayState extends State {
         VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
         TextureComponent texture = engine.createComponent(TextureComponent.class);
         PlayerComponent playerCmp = engine.createComponent(PlayerComponent.class);
+        CollisionComponent collision = engine.createComponent(CollisionComponent.class);
+        LivesComponent lives = engine.createComponent(LivesComponent.class);
+
         // Set component values
         float xPosition = Gdx.graphics.getWidth() / 2f;
         float yPosition = (Gdx.graphics.getHeight() / 3f)-100;
         transform.position.set(xPosition, yPosition, 0);
-        transform.scale.set(7f,7f,7f);
+        float scale = 7f;
+        transform.scale.set(scale, scale, scale);
         texture.region = new TextureRegion(player);
+        lives.lives = 3;
+
+        collision.bounds = new Rectangle(xPosition, yPosition, player.getWidth()*scale, player.getHeight()*scale);
+
 
         // Add components to player entity
         playerEntity.add(transform);
         playerEntity.add(velocity);
         playerEntity.add(texture);
         playerEntity.add(playerCmp);
+        playerEntity.add(collision);
+        playerEntity.add(lives);
 
         // Add the entity to the engine
         engine.addEntity(playerEntity);
@@ -102,7 +112,6 @@ public class PlayState extends State {
         lives.lives = 3;
         texture.region = new TextureRegion(enemy);
 
-        // Assuming you're using a Rectangle for collision bounds
         collision.bounds = new Rectangle(x, y, enemy.getWidth()*scale, enemy.getHeight()*scale);
 
         // Add components to enemy entity
@@ -111,7 +120,7 @@ public class PlayState extends State {
         enemyEntity.add(texture);
         enemyEntity.add(lives);
         enemyEntity.add(enemyCmp);
-        enemyEntity.add(collision); // Add the CollisionComponent
+        enemyEntity.add(collision);
 
         // Add the entity to the engine
         engine.addEntity(enemyEntity);
@@ -129,12 +138,12 @@ public class PlayState extends State {
         TransformComponent playerTransform = pm.get(playerEntity);
 
         // Set component values
+        bulletCmp.speed = 400;
         transform.position.set(playerTransform.position.x, playerTransform.position.y + 50, 0);
         float scale = 7f;
         transform.scale.set(scale, scale, scale);
         texture.region = new TextureRegion(bullet);
 
-        // Assuming you're using a Rectangle for collision bounds
         collision.bounds = new Rectangle(playerTransform.position.x, playerTransform.position.y + 50, bullet.getWidth()*scale, bullet.getHeight()*scale);
 
         // Add components to player entity
