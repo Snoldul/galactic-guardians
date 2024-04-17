@@ -9,9 +9,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.tdt4240gr18.game.entity.components.EnemyComponent;
 import com.tdt4240gr18.game.entity.components.LivesComponent;
+import com.tdt4240gr18.game.entity.components.MovementPropertiesComponent;
+import com.tdt4240gr18.game.entity.components.MovementStateComponent;
 import com.tdt4240gr18.game.entity.components.PlayerComponent;
 import com.tdt4240gr18.game.entity.systems.EnemyControlSystem;
 import com.tdt4240gr18.game.entity.systems.PlayerControlSystem;
@@ -46,7 +49,7 @@ public class PlayState extends State {
         engine.addSystem(new PlayerControlSystem());
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderingSystem(sb));
-        engine.addSystem(new EnemyControlSystem());
+        engine.addSystem(new EnemyControlSystem(this));
         createPlayer();
     }
 
@@ -81,10 +84,16 @@ public class PlayState extends State {
         TextureComponent texture = engine.createComponent(TextureComponent.class);
         LivesComponent lives = engine.createComponent(LivesComponent.class);
         EnemyComponent enemyCmp = engine.createComponent(EnemyComponent.class);
+        MovementStateComponent state = engine.createComponent(MovementStateComponent.class);
+        MovementPropertiesComponent properties = engine.createComponent(MovementPropertiesComponent.class);
 
-        // Set component values
+        // Initialize properties
+        properties.amplitude = 20;
+        properties.verticalSpeed = -20;
+
+        // Initialize components
         transform.position.set(x, y, 0);
-        transform.scale.set(5f,5f,5f);
+        transform.scale.set(5f, 5f, 5f);
         lives.lives = 4;
         texture.region = new TextureRegion(enemy);
 
@@ -94,9 +103,21 @@ public class PlayState extends State {
         enemyEntity.add(texture);
         enemyEntity.add(lives);
         enemyEntity.add(enemyCmp);
+        enemyEntity.add(state);
+        enemyEntity.add(properties);
 
         // Add the entity to the engine
         engine.addEntity(enemyEntity);
+    }
+    public Vector2 getPlayerPosition() {
+        TransformComponent playerPos;
+        if (playerEntity != null) {
+            playerPos = playerEntity.getComponent(TransformComponent.class);
+        if (playerPos != null) {
+            return new Vector2(playerPos.position.x, playerPos.position.y);
+            }
+        }
+        return null;
     }
 
     @Override
