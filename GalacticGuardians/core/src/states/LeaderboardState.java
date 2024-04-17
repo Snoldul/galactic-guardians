@@ -90,8 +90,8 @@ public class LeaderboardState extends State{
         // Change current user to the user that is logged in
         currentUser = databaseInterface.getEntry("Johannes");
         userYValue = (int) (height - ((int) font.getLineHeight() + buttonOffsetY) * (entriesPerPage + 1.5f));
-        myRankButton = addSmallButton("Me", buttonWidth / 77*24, (float) 0.38f * width - width * buttonWidth / 77*24 / 2, arrowY);
-        topRankButton = addSmallButton("Top", buttonWidth / 77*24, (float) 0.62f * width - width * buttonWidth / 77*24 / 2, arrowY);
+        myRankButton = addSmallButton("Me", buttonWidth / 77*24, 0.38f * width - width * buttonWidth / 77*24 / 2, arrowY);
+        topRankButton = addSmallButton("Top", buttonWidth / 77*24, 0.62f * width - width * buttonWidth / 77*24 / 2, arrowY);
         myRankButton.setY(arrowY);
 
 

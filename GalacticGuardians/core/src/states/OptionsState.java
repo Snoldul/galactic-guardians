@@ -20,7 +20,6 @@ public class OptionsState extends State{
     private BitmapFont fontTitle;
     private final List<Option> options = new ArrayList<>();
 
-    private GlyphLayout layout;
     private Texture optionsMenu;
     private Rectangle xBtnBounds;
     private Texture xBtn;
@@ -150,7 +149,7 @@ public class OptionsState extends State{
     }
 
     private void renderTitle(SpriteBatch sb){
-        layout = new GlyphLayout(fontTitle, TITLE_TEXT);
+        GlyphLayout layout = new GlyphLayout(fontTitle, TITLE_TEXT);
         float titleWidth = layout.width;
         float titleHeight = layout.height;
         float titleX = menuPosX + ((menuWidth - titleWidth) / 2);

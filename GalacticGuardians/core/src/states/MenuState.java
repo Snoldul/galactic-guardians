@@ -66,6 +66,10 @@ public class MenuState extends State{
                     }
                     if (button.getButtonText().equals("Login")) {
                         gsm.push(new RegisterUserState(gsm));
+                        isLoggedIn = true;
+                    }
+                    if (button.getButtonText().equals("Logout")) {
+                        isLoggedIn = false;
                     }
                     if (button.getButtonText().equals("Leaderboard")) {
                         gsm.push(new LeaderboardState(gsm, databaseInterface));
