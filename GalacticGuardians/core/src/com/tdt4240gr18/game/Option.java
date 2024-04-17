@@ -53,4 +53,8 @@ public class Option {
         onTexture.dispose();
         offTexture.dispose();
     }
+
+    public void setOptionText(String optionText) {
+        this.optionText = optionText;
+    }
 }

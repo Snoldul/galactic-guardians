@@ -75,7 +75,7 @@ public class OptionsState extends State{
         float xBtnWidth = xBtn.getWidth();
         float xBtnHeight = xBtn.getHeight();
         float xButtonX = (width - xBtnWidth) / 2;
-        float xButtonY = menuPosY - xBtnHeight / 2;
+        float xButtonY = menuPosY - xBtnHeight / 2 + 1030f / 30 / 2; // 1030 is height of current menu, 30 is height of bottow row
         xBtnBounds = new Rectangle(xButtonX, xButtonY, xBtnWidth, xBtnHeight);
     }
     public void addOption(String text) {
