@@ -11,12 +11,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Align;
 import com.tdt4240gr18.game.MenuButton;
-import com.tdt4240gr18.game.Option;
 import com.tdt4240gr18.game.ggTexture;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class RegisterUserState  extends State{
 
@@ -26,8 +23,6 @@ public class RegisterUserState  extends State{
     private static final String TITLE_TEXT = "Register";
 
     private BitmapFont fontTitle, font;
-    private final List<Option> options = new ArrayList<>();
-
     private GlyphLayout titleLayout, entryLayout;
     private Texture optionsMenu;
     private Rectangle xBtnBounds;
@@ -58,7 +53,6 @@ public class RegisterUserState  extends State{
         initializeTextures();
         initializeDimensions();
         initializeFont();
-        initializeOptions();
         initializeXButtonBounds();
         initializeMenuButtons();
         initializeTextFields();
@@ -144,6 +138,7 @@ public class RegisterUserState  extends State{
         // X and Y pos of optionsMenu
         menuPosX = (width - menuWidth) / 2;
         menuPosY = (height - menuHeight) / 2 + height * 0.05f;
+        offsetFromTop = 0.2f * menuHeight;
     }
 
     private void initializeFont(){
@@ -160,42 +155,12 @@ public class RegisterUserState  extends State{
         loginRegisterPromtLayout = new GlyphLayout(font, loginRegisterPrompt);
     }
 
-    public void initializeOptions(){
-        addTextfield(email);
-        addTextfield(username);
-        addTextfield(password);
-    }
-
     private void initializeXButtonBounds(){
         float xBtnWidth = xBtn.getWidth();
         float xBtnHeight = xBtn.getHeight();
         float xButtonX = (width - xBtnWidth) / 2;
         float xButtonY = menuPosY - xBtnHeight / 2 + 1030f / 30 / 2; // 1030 is height of current menu, 30 is height of bottow row
         xBtnBounds = new Rectangle(xButtonX, xButtonY, xBtnWidth, xBtnHeight);
-    }
-
-    public void addTextfield(String text) {
-        Rectangle optionBounds = calculateTextfieldBounds();
-        Rectangle buttonBounds = calculateButtonBounds(optionBounds);
-        //options.add(new Option(text, onTexture, offTexture, optionBounds, buttonBounds));
-    }
-
-    private Rectangle calculateTextfieldBounds(){
-        // Space from top of screen to first option
-        offsetFromTop = 0.2f * menuHeight;
-        float optionWidth = menuWidth * 0.8f;
-        float optionHeight = onTexture.getHeight();
-        float optionX = menuPosX + (menuWidth - optionWidth) / 2;
-        float optionY = menuPosY + menuHeight - (options.size() + 1) * (optionHeight * OPTION_OFFSET) - offsetFromTop;
-        return new Rectangle(optionX, optionY, optionWidth, optionHeight);
-    }
-
-    private Rectangle calculateButtonBounds(Rectangle optionBounds){
-        float buttonWidth = onTexture.getWidth();
-        float buttonHeight = onTexture.getHeight();
-        float imageX = optionBounds.x + optionBounds.width - buttonWidth;
-        float imageY = optionBounds.y + (optionBounds.height - buttonHeight) / 2;
-        return new Rectangle(imageX, imageY, buttonWidth, buttonHeight);
     }
 
     @Override
@@ -230,7 +195,6 @@ public class RegisterUserState  extends State{
         sb.begin();
         renderOptionsMenu(sb);
         renderTitle(sb);
-        renderOptions(sb);
         loginButton.render(sb);
         registerButton.render(sb);
         renderTextField(sb, "Email", email, emailBounds);
@@ -239,45 +203,7 @@ public class RegisterUserState  extends State{
         fontTitle.setColor(Color.WHITE);
         font.draw(sb, loginRegisterPrompt, (width - loginRegisterPromtLayout.width) / 2, loginPromtY);
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(0, 0, 1, 0.4f);
-        //shapeRenderer.rect(emailBounds.x, emailBounds.y, emailBounds.width, emailBounds.height);
-        //drawRoundedRect(shapeRenderer, emailBounds.x, emailBounds.y, emailBounds.width, emailBounds.height, 20);
-        shapeRenderer.end();
-
         sb.end();
-    }
-
-    private void drawRoundedRect(ShapeRenderer shapeRenderer, float x, float y, float width, float height, float cornerRadius) {
-        float centerX = x + cornerRadius;
-        float centerY = y + cornerRadius;
-
-        // Draw top left corner
-        shapeRenderer.arc(centerX, centerY, cornerRadius, 180f, 90f);
-
-        // Draw top edge
-        shapeRenderer.rect(x + cornerRadius, y, width - 2 * cornerRadius, cornerRadius);
-
-        // Draw top right corner
-        centerX = x + width - cornerRadius;
-        shapeRenderer.arc(centerX, centerY, cornerRadius, 270f, 90f);
-
-        // Draw right edge
-        shapeRenderer.rect(x + width - cornerRadius, y + cornerRadius, cornerRadius, height - 2 * cornerRadius);
-
-        // Draw bottom right corner
-        centerY = y + height - cornerRadius;
-        shapeRenderer.arc(centerX, centerY, cornerRadius, 0f, 90f);
-
-        // Draw bottom edge
-        shapeRenderer.rect(x + cornerRadius, y + height - cornerRadius, width - 2 * cornerRadius, cornerRadius);
-
-        // Draw bottom left corner
-        centerX = x + cornerRadius;
-        shapeRenderer.arc(centerX, centerY, cornerRadius, 90f, 90f);
-
-        // Draw left edge
-        shapeRenderer.rect(x, y + cornerRadius, cornerRadius, height - 2 * cornerRadius);
     }
 
     private void renderTextField(SpriteBatch sb, String infoText, String entryText, Rectangle bounds){
@@ -302,11 +228,6 @@ public class RegisterUserState  extends State{
     private void renderTitle(SpriteBatch sb){
         fontTitle.draw(sb, titleLayout, titleX, titleY);
     }
-    private void renderOptions(SpriteBatch sb){
-        for (Option option : options){
-            option.render(sb);
-        }
-    }
 
     @Override
     public void dispose() {
@@ -314,9 +235,6 @@ public class RegisterUserState  extends State{
         xBtn.dispose();
         onTexture.dispose();
         offTexture.dispose();
-        for (Option option : options){
-            option.dispose();
-        }
         shapeRenderer.dispose();
         font.dispose();
         fontTitle.dispose();
