@@ -57,6 +57,9 @@ public class MenuState extends State{
                         gsm.set(new LeaderboardState(gsm, databaseInterface));
                         dispose();
                     }
+                    if (button.getButtonText().equals("Options")) {
+                        gsm.push(new OptionsState(gsm));
+                    }
                 }
             }
         }
