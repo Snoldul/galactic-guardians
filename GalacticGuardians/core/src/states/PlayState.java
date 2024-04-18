@@ -54,11 +54,8 @@ public class PlayState extends State {
     private Entity playerEntity;
     private boolean isPaused;
     private final Texture bullet;
-    private final Texture movementSpace;
     private final Texture heart;
     private final AudioManager audioManager;
-    private SpriteBatch sb;
-    private Entity playerEntity;
     private Entity scoreEntity;
 
     private float spawnTimer;
