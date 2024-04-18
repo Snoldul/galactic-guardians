@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.entity.components.BulletComponent;
 import com.tdt4240gr18.game.entity.components.CollisionComponent;
 import com.tdt4240gr18.game.entity.components.ExplosionComponent;
@@ -29,11 +30,13 @@ public class BulletControlSystem extends IteratingSystem {
 
     private final Texture explosion1Texture;
     private PooledEngine engine;
+    private final AudioManager audioManager;
 
     public BulletControlSystem(PooledEngine engine) {
         super(Family.all(BulletComponent.class).get());
         this.engine = engine;
         explosion1Texture = new Texture("explosion1.png");
+        audioManager = AudioManager.getInstance();
     }
 
     @Override
@@ -77,6 +80,9 @@ public class BulletControlSystem extends IteratingSystem {
                 // Decrement the player's lives by the damage of the bullet
                 playerLives.lives -= bullet.damage;
 
+                // Play death sound
+                audioManager.playDeathSound();
+
                 // check if its lives are 0
                 if (playerLives.lives <= 0) {
                     System.out.println("dead");
@@ -109,6 +115,9 @@ public class BulletControlSystem extends IteratingSystem {
 
                         createExplosion((int) enemyTransform.position.x, (int) enemyTransform.position.y - (int) enemyTransform.scale.y);
                         engine.removeEntity(enemyEntity);
+
+                        // Play hit sound
+                        audioManager.playHitSound();
 
                     }
 
