@@ -5,9 +5,29 @@ import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.tdt4240gr18.game.DatabaseInterface;
 import com.tdt4240gr18.game.GalacticGuardians;
+import com.tdt4240gr18.game.LeaderboardEntry;
+import com.tdt4240gr18.game.OnDataLoadedCallback;
 
 public class HtmlLauncher extends GwtApplication {
-        private final DatabaseInterface databaseInterface = () -> {
+        private final DatabaseInterface databaseInterface = new DatabaseInterface() {
+
+            @Override
+            public void getAllEntries(OnDataLoadedCallback callback) {
+            }
+
+            @Override
+            public void getEntriesPerPage(int pageNumber, int entriesPerPage, OnDataLoadedCallback callback) {
+            }
+
+            @Override
+            public LeaderboardEntry getEntry(String username) {
+                return null;
+            }
+
+            @Override
+            public void addScoreToLeaderboard(String username, int score) {
+
+            }
 
         };
 

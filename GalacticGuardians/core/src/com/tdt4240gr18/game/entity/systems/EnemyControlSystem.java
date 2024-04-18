@@ -3,6 +3,7 @@ package com.tdt4240gr18.game.entity.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
@@ -14,6 +15,20 @@ import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
 
 import states.PlayState;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.tdt4240gr18.game.entity.components.BulletComponent;
+import com.tdt4240gr18.game.entity.components.CollisionComponent;
+import com.tdt4240gr18.game.entity.components.EnemyComponent;
+import com.tdt4240gr18.game.entity.components.LivesComponent;
+import com.tdt4240gr18.game.entity.components.TextureComponent;
+import com.tdt4240gr18.game.entity.components.TransformComponent;
+import com.tdt4240gr18.game.entity.components.VelocityComponent;
+
+import java.util.Random;
+import java.util.random.RandomGenerator;
 
 public class EnemyControlSystem extends IteratingSystem {
     private ComponentMapper<TransformComponent> pm = ComponentMapper.getFor(TransformComponent.class);
@@ -21,11 +36,15 @@ public class EnemyControlSystem extends IteratingSystem {
     private ComponentMapper<MovementStateComponent> stateMapper = ComponentMapper.getFor(MovementStateComponent.class);
     private ComponentMapper<MovementPropertiesComponent> propertiesMapper = ComponentMapper.getFor(MovementPropertiesComponent.class);
     private PlayState playstate;
+    private final Texture bullet;
+    private PooledEngine engine;
 
-
-    public EnemyControlSystem(PlayState playstate) {
+    public EnemyControlSystem(PlayState playstate, PooledEngine engine) {
         super(Family.all(TransformComponent.class, VelocityComponent.class, EnemyComponent.class, MovementStateComponent.class, MovementPropertiesComponent.class).get());
         this.playstate = playstate;
+        // Specify that this system uses entities with both Transform and Velocity components
+        this.engine = engine;
+        bullet = new Texture("pew2.png");
     }
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
@@ -36,7 +55,7 @@ public class EnemyControlSystem extends IteratingSystem {
 
         stateComp.elapsedTime += deltaTime;
 
-        if(pos.position.y < 0 || pos.position.y > gameplayScreenHeight) {
+        if(pos.position.y < 0) {
             getEngine().removeEntity(entity);
             //TODO: Remove lives from player
         }
@@ -56,6 +75,51 @@ public class EnemyControlSystem extends IteratingSystem {
             default:
                 processFloating(entity, deltaTime, props);
                 break;
+        }
+
+        // Update collisionComponent position
+        TransformComponent transform = entity.getComponent(TransformComponent.class);
+        CollisionComponent bulletCollision = entity.getComponent(CollisionComponent.class);
+        Rectangle bounds = (Rectangle) bulletCollision.bounds;
+        bounds.x = transform.position.x;
+        bounds.y = transform.position.y;
+
+        // Shoots somewhat randomly
+        if (MathUtils.random() < 0.004) {
+            // Creating a bullet
+            Entity bulletEntity = engine.createEntity();
+            TransformComponent bulletTransform = engine.createComponent(TransformComponent.class);
+            VelocityComponent bulletVelocity = engine.createComponent(VelocityComponent.class);
+            TextureComponent bulletTexture = engine.createComponent(TextureComponent.class);
+            BulletComponent bulletCmp = engine.createComponent(BulletComponent.class);
+            CollisionComponent collision = engine.createComponent(CollisionComponent.class);
+
+            TransformComponent enemyTransform = pm.get(entity);
+
+            // Set component values
+            bulletCmp.speed = -200;
+
+            CollisionComponent collisionComponent = entity.getComponent(CollisionComponent.class);
+            Rectangle enemyBounds = (Rectangle) collisionComponent.bounds;
+            int enemyHeight = (int) enemyBounds.getHeight();
+
+            bulletTransform.position.set(enemyTransform.position.x, enemyTransform.position.y - enemyHeight, 0);
+            float scale = 7f;
+            bulletTransform.scale.set(scale, scale, scale);
+            bulletTexture.region = new TextureRegion(bullet);
+
+            // Assuming you're using a Rectangle for collision bounds
+            collision.bounds = new Rectangle(enemyTransform.position.x, enemyTransform.position.y - enemyHeight, bullet.getWidth() * scale, bullet.getHeight() * scale);
+
+            // Add components to player entity
+            bulletEntity.add(bulletTransform);
+            bulletEntity.add(bulletVelocity);
+            bulletEntity.add(bulletTexture);
+            bulletEntity.add(bulletCmp);
+            bulletEntity.add(collision); // Add the CollisionComponent
+
+            // Add the entity to the engine
+            engine.addEntity(bulletEntity);
         }
     }
     private void processSwoopingEntry(Entity entity, float deltaTime, MovementPropertiesComponent props, MovementStateComponent stateComp) {
@@ -164,6 +228,8 @@ public class EnemyControlSystem extends IteratingSystem {
         } else {
             vel.velocity.x = 0;
             vel.velocity.y = 0;
+            // Update position based on velocity
+            pos.position.add(vel.velocity.x * deltaTime, vel.velocity.y * deltaTime, 0);
         }
     }
 }

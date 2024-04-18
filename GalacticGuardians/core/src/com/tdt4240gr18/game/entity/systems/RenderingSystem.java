@@ -12,8 +12,8 @@ import com.badlogic.gdx.utils.Array;
 import java.util.Comparator;
 
 public class RenderingSystem extends SortedIteratingSystem {
-    private ComponentMapper<TransformComponent> trm;
-    private ComponentMapper<TextureComponent> tm;
+    private final ComponentMapper<TransformComponent> trm;
+    private final ComponentMapper<TextureComponent> tm;
     private Array<Entity> renderQueue;
     private SpriteBatch batch;
 
