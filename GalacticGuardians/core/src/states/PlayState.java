@@ -20,12 +20,14 @@ import com.tdt4240gr18.game.entity.systems.RenderingSystem;
 import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
 import com.tdt4240gr18.game.entity.components.TextureComponent;
+import com.tdt4240gr18.game.ScrollingBackground;
 
 
 
 public class PlayState extends State {
     private final BitmapFont title = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
     private final PooledEngine engine = new PooledEngine();
+    private final ScrollingBackground scrollingBackground = new ScrollingBackground();
     private final Texture player;
     private final Texture enemy;
     private final Texture pauseBtn;
@@ -160,6 +162,7 @@ public class PlayState extends State {
         Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 
         sb.begin();
+        scrollingBackground.render(Gdx.graphics.getDeltaTime(), sb);
         sb.draw(movementSpace, 10, 10, Gdx.graphics.getWidth() - 10, Gdx.graphics.getHeight() / 4f);
         sb.draw(pauseBtn, pauseBtnBounds.x, pauseBtnBounds.y, pauseBtnBounds.width, pauseBtnBounds.height);
         sb.end();

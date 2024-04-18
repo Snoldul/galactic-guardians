@@ -1,34 +1,38 @@
 package com.tdt4240gr18.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 public class MenuButton {
-    private final Texture buttonTexture;
+    private final ggTexture buttonTexture;
     private final Rectangle bounds;
-    private final BitmapFont font;
+    private BitmapFont font;
     private GlyphLayout layout;
-    private final String buttonText;
+    private String buttonText;
 
 
-    public MenuButton(Texture texture, String text, float x, float y) {
+    public MenuButton(ggTexture texture, String text, float x, float y) {
         this.buttonTexture = texture;
         this.bounds = new Rectangle(x, y, texture.getWidth(), texture.getHeight());
         this.font = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
         this.buttonText = text;
         float textScale = 2;
         font.getData().setScale(textScale);
+        this.layout = new GlyphLayout(font, buttonText);
+
+
+    }
+    public MenuButton(ggTexture texture, float x, float y) {
+        this.buttonTexture = texture;
+        this.bounds = new Rectangle(x, y, texture.getWidth(), texture.getHeight());
 
     }
 
     public void render(SpriteBatch sb) {
         sb.draw(buttonTexture, bounds.x, bounds.y);
-
-        this.layout = new GlyphLayout(font, buttonText);
 
         float textWidth = layout.width;
         float textHeight = layout.height;
@@ -37,6 +41,10 @@ public class MenuButton {
         float textY = bounds.y + ((bounds.height + textHeight) / 2) + 12;
 
         font.draw(sb, layout, textX, textY);
+    }
+
+    public void render(SpriteBatch sb, boolean containsText) { // containText is used in order to overload the constructor for buttons that don't have text
+        sb.draw(buttonTexture, bounds.x, bounds.y);
     }
 
     public boolean isClicked(float x, float y) {
@@ -52,4 +60,7 @@ public class MenuButton {
         return buttonText;
     }
 
+    public void setY(float y) {
+        bounds.y = y;
+    }
 }
