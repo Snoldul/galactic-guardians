@@ -18,6 +18,7 @@ import com.tdt4240gr18.game.entity.components.CollisionComponent;
 import com.tdt4240gr18.game.entity.components.ExplosionComponent;
 import com.tdt4240gr18.game.entity.components.LivesComponent;
 import com.tdt4240gr18.game.entity.components.PlayerComponent;
+import com.tdt4240gr18.game.entity.components.ScoreComponent;
 import com.tdt4240gr18.game.entity.components.TextureComponent;
 import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
@@ -109,6 +110,16 @@ public class BulletControlSystem extends IteratingSystem {
 
                         createExplosion((int) enemyTransform.position.x, (int) enemyTransform.position.y - (int) enemyTransform.scale.y);
                         engine.removeEntity(enemyEntity);
+
+                        // Update score
+                        Family scoreFamily = Family.all(ScoreComponent.class).get();
+                        ImmutableArray<Entity> entitiesWithScore = engine.getEntitiesFor(scoreFamily);
+
+                        if (entitiesWithScore.size() > 0) {
+                            Entity entityWithScore = entitiesWithScore.first(); // Assuming there is only one entity
+                            ScoreComponent scoreComponent = entityWithScore.getComponent(ScoreComponent.class);
+                            scoreComponent.incrementScore(1);
+                        }
 
                     }
 
