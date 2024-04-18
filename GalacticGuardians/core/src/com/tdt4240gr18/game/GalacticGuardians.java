@@ -12,7 +12,6 @@ public class GalacticGuardians extends ApplicationAdapter {
 	private final DatabaseInterface databaseInterface;
 	private GameStateManager gsm;
 	private SpriteBatch batch;
-	private Music music;
 
 	public GalacticGuardians(DatabaseInterface databaseInterface) {
 		this.databaseInterface = databaseInterface;
@@ -23,12 +22,9 @@ public class GalacticGuardians extends ApplicationAdapter {
 		batch = new SpriteBatch();
 		//databaseInterface.fetchDataFromDatabase();
 		gsm = new GameStateManager();
+		AudioManager audioManager = AudioManager.getInstance();
+		audioManager.playMusic();
 		gsm.push(new MenuState(gsm, databaseInterface));
-
-		Music music = Gdx.audio.newMusic(Gdx.files.internal("RetroMusic.mp3"));
-		music.setLooping(true);
-		music.setVolume(1f);
-		music.play();
 	}
 
 	@Override
