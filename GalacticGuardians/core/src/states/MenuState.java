@@ -2,6 +2,7 @@ package states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.DatabaseInterface;
 import com.tdt4240gr18.game.MenuButton;
 import com.tdt4240gr18.game.ggTexture;
@@ -18,10 +19,12 @@ public class MenuState extends State{
     public final float logoWidthRatio;
     private final List<MenuButton> buttons;
     private final DatabaseInterface databaseInterface;
+    private final AudioManager audioManager;
 
     public MenuState(GameStateManager gsm, DatabaseInterface databaseInterface) {
         super(gsm);
         this.databaseInterface = databaseInterface;
+        this.audioManager = AudioManager.getInstance();
         buttonWidthRatio = 0.7f;
         logoWidthRatio = 0.9f;
         logo = new ggTexture("logo.png", logoWidthRatio);
@@ -52,14 +55,17 @@ public class MenuState extends State{
                 if (button.isClicked(touchX, touchY)) {
                     // Burde egentlig bruke push og pop i stedet for set men får ikke til, skjermen blir bare svart etter å pop-e
                     if (button.getButtonText().equals("Start")) {
+                        audioManager.playButtonSound();
                         gsm.set(new PlayState(gsm));
                         dispose();
                     }
                     if (button.getButtonText().equals("Leaderboard")) {
+                        audioManager.playButtonSound();
                         gsm.set(new LeaderboardState(gsm, databaseInterface));
                         dispose();
                     }
                     if (button.getButtonText().equals("Options")) {
+                        audioManager.playButtonSound();
                         gsm.push(new OptionsState(gsm));
                     }
                 }
