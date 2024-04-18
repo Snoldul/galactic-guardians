@@ -24,7 +24,6 @@ public class EnemyControlSystem extends IteratingSystem {
 
 
     public EnemyControlSystem(PlayState playstate) {
-        // Specify that this system uses entities with both Transform and Velocity components
         super(Family.all(TransformComponent.class, VelocityComponent.class, EnemyComponent.class, MovementStateComponent.class, MovementPropertiesComponent.class).get());
         this.playstate = playstate;
     }
@@ -37,12 +36,15 @@ public class EnemyControlSystem extends IteratingSystem {
 
         switch (stateComp.state) {
             case ENTERING:
+
                 processSwoopingEntry(entity, deltaTime, props, stateComp);
                 break;
             case FLOATING:
+
                 processFloating(entity, deltaTime, props);
                 break;
             case DIVING:
+
                 processDiving(entity, deltaTime, props);
                 break;
             default:
@@ -59,40 +61,86 @@ public class EnemyControlSystem extends IteratingSystem {
             float targetY = Gdx.graphics.getHeight() * 0.8f;
             float progress = stateComp.elapsedTime / entryPhaseDuration;
 
-            // Interpolating position
+            // Interpolating position for Y
             float newY = MathUtils.lerp(Gdx.graphics.getHeight(), targetY, progress);
             vel.velocity.y = (newY - pos.position.y) / deltaTime;
 
-            // Sine wave motion
-            float originalX = pos.position.x;  // This should be stored or derived if dynamic
+            // Sine wave motion for X
             float amplitude = props.amplitude;
-            float frequency = props.verticalSpeed;  // Consider renaming to frequency if it's not indicative of vertical speed
-            float desiredX = originalX + amplitude * MathUtils.sin(frequency * stateComp.elapsedTime);
+            float frequency = props.frequency;
+            float desiredX = pos.position.x + amplitude * MathUtils.sin(frequency * stateComp.elapsedTime);
             vel.velocity.x = (desiredX - pos.position.x) / deltaTime;
+
+            // Ensure the entity does not go off screen horizontally
+            float screenWidth = Gdx.graphics.getWidth();
+            if (desiredX < 10 || desiredX > screenWidth) {
+                vel.velocity.x = -vel.velocity.x; // Reverse the direction if it goes off screen
+            }
         } else {
             // Transition to next state and reset necessary properties
             stateComp.state = MovementStateComponent.State.FLOATING;
-            vel.velocity.y = 0;  // Stopping vertical movement as we enter floating
-            // Resetting elapsed time can be useful if the next state also relies on timing
+            vel.velocity.y = 0; // Stop vertical movement after entry phase
+            vel.velocity.x = 0; // Reset horizontal velocity to avoid initial burst movement
             stateComp.elapsedTime = 0;
+        }
+
+        // Apply boundary checks
+        float screenWidth = Gdx.graphics.getWidth();
+        float screenHeight = Gdx.graphics.getHeight();
+        if (pos.position.x < 0) {
+            pos.position.x = 0; // Stick to the left boundary
+        } else if (pos.position.x > screenWidth) {
+            pos.position.x = screenWidth; // Stick to the right boundary
+        }
+
+        if (pos.position.y < 0) {
+            pos.position.y = 0; // Stick to the bottom boundary
+        } else if (pos.position.y > screenHeight) {
+            pos.position.y = screenHeight; // Stick to the top boundary
         }
     }
     private void processFloating(Entity entity, float deltaTime, MovementPropertiesComponent props) {
-        TransformComponent pos = pm.get(entity);
         VelocityComponent vel = vm.get(entity);
 
-        // Assuming the verticalSpeed variable might be used as a frequency factor for oscillation,
-        // which should be clarified or renamed in your actual implementation.
-        float frequency = props.verticalSpeed; // This should be renamed if it represents frequency.
+        // Frequency for oscillation
+        float frequency = props.frequency;
+        // Amplitude for oscillation
+        float amplitude = props.amplitude + MathUtils.random(1, 5) * 5;
 
-        // Calculate and apply the new velocity
-        // The sine function will adjust the x velocity to create an oscillating motion
-        // Multiplying by deltaTime ensures that changes in velocity are frame-rate independent
-        float newVelocityX = props.amplitude * MathUtils.sin(frequency * pos.position.y);
-        vel.velocity.x = newVelocityX * deltaTime; // Apply delta time scaling to make motion smooth and consistent
+        // Horizontal Oscillation
+        // Using a sine function to create a horizontal oscillating motion.
+        // The amplitude and frequency determine the behavior of this oscillation.
+        if(props.oscillationPhase == 0) {
+            props.oscillationPhase = MathUtils.random(0, 2 * MathUtils.PI);
+        }
+        props.oscillationPhase += deltaTime * frequency;
+        float newVelocityX = amplitude * MathUtils.sin(props.oscillationPhase);
+        vel.velocity.x = newVelocityX; // Apply delta time scaling to make motion smooth and consistent
 
-        // Apply a similar deltaTime adjustment to the y velocity, assuming a constant floating velocity
-        vel.velocity.y = -props.verticalSpeed * deltaTime; // Negative to ensure it moves downward or adjust as needed
+        // Vertical movement
+        // Set a small, constant downward velocity to simulate slow floating.
+        float constantDownwardVelocity = 10f;
+        vel.velocity.y = -constantDownwardVelocity;
+
+        // Check if the enemy should dive
+        if (shouldDive(entity)) {
+            MovementStateComponent stateComp = stateMapper.get(entity);
+            stateComp.state = MovementStateComponent.State.DIVING;
+            stateComp.elapsedTime = 0; // Resetting time if transitioning states
+        }
+    }
+
+    private boolean shouldDive(Entity entity) {
+        TransformComponent pos = pm.get(entity);
+        MovementPropertiesComponent props = propertiesMapper.get(entity);
+
+        // Calculate the difference between current y position and target dive y
+        float distanceToDiveLine = Math.abs(pos.position.y - props.targetDiveY);
+
+        // Threshold for how close they need to be to the line to trigger a dive
+        float threshold = 10; // 10 pixels proximity to the line
+
+        return distanceToDiveLine <= threshold;
     }
     private void processDiving(Entity entity, float deltaTime, MovementPropertiesComponent props) {
         TransformComponent pos = pm.get(entity);
@@ -102,13 +150,10 @@ public class EnemyControlSystem extends IteratingSystem {
         if (playerPosition != null) {
             Vector2 diveDirection = new Vector2(playerPosition.x - pos.position.x, playerPosition.y - pos.position.y).nor();
             vel.velocity.x = diveDirection.x * props.amplitude * deltaTime;
-            vel.velocity.y = diveDirection.y * props.verticalSpeed * deltaTime;
+            vel.velocity.y = diveDirection.y * props.frequency * deltaTime;
         } else {
             vel.velocity.x = 0;
             vel.velocity.y = 0;
-            // Consider state change if applicable
-            // stateComp.state = MovementStateComponent.State.FLOATING;
-            // stateComp.elapsedTime = 0; // Resetting time if transitioning states
         }
     }
 }

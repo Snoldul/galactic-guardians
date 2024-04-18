@@ -88,8 +88,14 @@ public class PlayState extends State {
         MovementPropertiesComponent properties = engine.createComponent(MovementPropertiesComponent.class);
 
         // Initialize properties
-        properties.amplitude = 20;
-        properties.verticalSpeed = -20;
+        properties.amplitude = 10;
+        properties.frequency = 5;
+        properties.verticalSpeed = 10;
+
+        // Set a random target dive Y within the middle 30% of the screen
+        float middleStart = Gdx.graphics.getHeight() * 0.35f;
+        float middleEnd = Gdx.graphics.getHeight() * 0.65f;
+        properties.targetDiveY = MathUtils.random(middleStart, middleEnd);
 
         // Initialize components
         transform.position.set(x, y, 0);
