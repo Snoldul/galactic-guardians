@@ -14,15 +14,15 @@ import java.util.Comparator;
 public class RenderingSystem extends SortedIteratingSystem {
     private final ComponentMapper<TransformComponent> trm;
     private final ComponentMapper<TextureComponent> tm;
-    private Array<Entity> renderQueue;
-    private SpriteBatch batch;
+    private final Array<Entity> renderQueue;
+    private final SpriteBatch batch;
 
     public RenderingSystem(SpriteBatch batch) {
         super(Family.all(TransformComponent.class, TextureComponent.class).get(), new ZComparator());
         trm = ComponentMapper.getFor(TransformComponent.class);
         tm = ComponentMapper.getFor(TextureComponent.class);
 
-        renderQueue = new Array<Entity>();
+        renderQueue = new Array<>();
         this.batch = batch;
     }
 

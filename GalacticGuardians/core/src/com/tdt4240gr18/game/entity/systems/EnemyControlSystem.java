@@ -17,27 +17,19 @@ import com.tdt4240gr18.game.entity.components.VelocityComponent;
 import states.PlayState;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.tdt4240gr18.game.entity.components.BulletComponent;
 import com.tdt4240gr18.game.entity.components.CollisionComponent;
-import com.tdt4240gr18.game.entity.components.EnemyComponent;
-import com.tdt4240gr18.game.entity.components.LivesComponent;
 import com.tdt4240gr18.game.entity.components.TextureComponent;
-import com.tdt4240gr18.game.entity.components.TransformComponent;
-import com.tdt4240gr18.game.entity.components.VelocityComponent;
-
-import java.util.Random;
-import java.util.random.RandomGenerator;
 
 public class EnemyControlSystem extends IteratingSystem {
-    private ComponentMapper<TransformComponent> pm = ComponentMapper.getFor(TransformComponent.class);
-    private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
-    private ComponentMapper<MovementStateComponent> stateMapper = ComponentMapper.getFor(MovementStateComponent.class);
-    private ComponentMapper<MovementPropertiesComponent> propertiesMapper = ComponentMapper.getFor(MovementPropertiesComponent.class);
-    private PlayState playstate;
+    private final ComponentMapper<TransformComponent> pm = ComponentMapper.getFor(TransformComponent.class);
+    private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
+    private final ComponentMapper<MovementStateComponent> stateMapper = ComponentMapper.getFor(MovementStateComponent.class);
+    private final ComponentMapper<MovementPropertiesComponent> propertiesMapper = ComponentMapper.getFor(MovementPropertiesComponent.class);
+    private final PlayState playstate;
     private final Texture bullet;
-    private PooledEngine engine;
+    private final PooledEngine engine;
 
     public EnemyControlSystem(PlayState playstate, PooledEngine engine) {
         super(Family.all(TransformComponent.class, VelocityComponent.class, EnemyComponent.class, MovementStateComponent.class, MovementPropertiesComponent.class).get());
@@ -182,8 +174,7 @@ public class EnemyControlSystem extends IteratingSystem {
             props.oscillationPhase = MathUtils.random(0, 2 * MathUtils.PI);
         }
         props.oscillationPhase += deltaTime * frequency;
-        float newVelocityX = amplitude * MathUtils.sin(props.oscillationPhase);
-        vel.velocity.x = newVelocityX; // Delta time scaling to make motion smooth and consistent
+        vel.velocity.x = amplitude * MathUtils.sin(props.oscillationPhase); // Delta time scaling to make motion smooth and consistent
 
         // Vertical movement
         // A small, constant downward velocity to simulate slow floating.

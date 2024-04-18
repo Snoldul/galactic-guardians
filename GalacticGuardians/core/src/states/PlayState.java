@@ -1,6 +1,5 @@
 package states;
 
-import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
@@ -14,7 +13,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.entity.components.BulletComponent;
@@ -38,12 +36,9 @@ import com.tdt4240gr18.game.entity.components.TextureComponent;
 import com.tdt4240gr18.game.ScrollingBackground;
 import com.tdt4240gr18.game.entity.systems.ScoreSystem;
 
-import java.awt.TextComponent;
-
-
 public class PlayState extends State {
 
-    private ComponentMapper<TransformComponent> pm = ComponentMapper.getFor(TransformComponent.class);
+    private final ComponentMapper<TransformComponent> pm = ComponentMapper.getFor(TransformComponent.class);
     private final BitmapFont title = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
     private final PooledEngine engine = new PooledEngine();
     private final ScrollingBackground scrollingBackground = new ScrollingBackground();
@@ -53,13 +48,12 @@ public class PlayState extends State {
     private final Texture pauseBtn;
     private final Texture movementSpace;
     private final Rectangle pauseBtnBounds;
-    private SpriteBatch sb;
+    private final SpriteBatch sb;
     private Entity playerEntity;
     private boolean isPaused;
     private final Texture bullet;
     private final Texture heart;
     private final AudioManager audioManager;
-    private Entity scoreEntity;
 
     private float spawnTimer;
     private float shotTimer;
@@ -233,7 +227,7 @@ public class PlayState extends State {
     }
 
     private void createScore() {
-        scoreEntity = new Entity();
+        Entity scoreEntity = new Entity();
         ScoreComponent score = engine.createComponent(ScoreComponent.class);
 
         scoreEntity.add(score);
@@ -255,23 +249,12 @@ public class PlayState extends State {
             }
         }
     }
-    private void movePlayer(float xDirection, float yDirection) {
-        VelocityComponent velocity = playerEntity.getComponent(VelocityComponent.class);
-        if (velocity != null) {
-            float speed = 100; // Adjust to control player speed
-            velocity.velocity.x = xDirection * speed;
-        }
-    }
 
     @Override
     public void update(float dt) {
 
         handleInput();
-    
-        if(!Gdx.input.isTouched()){
 
-         movePlayer(0, 0);
-        }
         shotTimer += dt;
         spawnTimer += dt;
         if(spawnTimer >= 2){
