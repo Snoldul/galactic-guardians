@@ -19,6 +19,7 @@ import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.entity.components.BulletComponent;
 import com.tdt4240gr18.game.entity.components.CollisionComponent;
 import com.tdt4240gr18.game.entity.components.HeartComponent;
+import com.tdt4240gr18.game.entity.components.ScoreComponent;
 import com.tdt4240gr18.game.entity.systems.BulletControlSystem;
 import com.tdt4240gr18.game.entity.components.EnemyComponent;
 import com.tdt4240gr18.game.entity.components.LivesComponent;
@@ -32,7 +33,9 @@ import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
 import com.tdt4240gr18.game.entity.components.TextureComponent;
 import com.tdt4240gr18.game.ScrollingBackground;
+import com.tdt4240gr18.game.entity.systems.ScoreSystem;
 
+import java.awt.TextComponent;
 
 
 public class PlayState extends State {
@@ -49,8 +52,8 @@ public class PlayState extends State {
     private final AudioManager audioManager;
     private SpriteBatch sb;
     private Entity playerEntity;
+    private Entity scoreEntity;
 
-    private Entity bulletEntity;
     private float spawnTimer;
     private float shotTimer;
 
@@ -70,8 +73,9 @@ public class PlayState extends State {
         engine.addSystem(new RenderingSystem(sb));
         engine.addSystem(new EnemyControlSystem(engine));
         engine.addSystem(new ExplosionSystem(engine));
+        engine.addSystem(new ScoreSystem(engine));
         createPlayer();
-        createBullet();
+        createScore();
         updateHearts();
     }
 
@@ -141,7 +145,7 @@ public class PlayState extends State {
 
 
     private void createBullet(){
-        bulletEntity = engine.createEntity();
+        Entity bulletEntity = engine.createEntity();
         TransformComponent transform = engine.createComponent(TransformComponent.class);
         VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
         TextureComponent texture = engine.createComponent(TextureComponent.class);
@@ -171,6 +175,15 @@ public class PlayState extends State {
 
         // Play the shooting sound
         audioManager.playLaserSound();
+    }
+
+    private void createScore() {
+        scoreEntity = new Entity();
+        ScoreComponent score = engine.createComponent(ScoreComponent.class);
+
+        scoreEntity.add(score);
+
+        engine.addEntity(scoreEntity);
     }
 
 
@@ -214,18 +227,15 @@ public class PlayState extends State {
     }
 
     private void updateHearts() {
-        System.out.println("\n There was a life loss, lives");
         // Create a family to get entities with HeartComponent
         Family heartFamily = Family.all(HeartComponent.class).get();
 
         // Get all entities with HeartComponent
         ImmutableArray<Entity> heartEntities = engine.getEntitiesFor(heartFamily);
-        System.out.println("\n Amount of hearts: " + heartEntities.size());
 
         // Collect entities to remove
         Array<Entity> entitiesToRemove = new Array<>();
         for (Entity entity : heartEntities) {
-            System.out.println("\n removed heart");
             entitiesToRemove.add(entity);
         }
 
@@ -252,7 +262,7 @@ public class PlayState extends State {
             transformComponent.scale.set(scale, scale, scale);
             textureComponent.region = new TextureRegion(heart);
 
-            transformComponent.position.set(60 + (textureComponent.region.getRegionHeight() * scale + 20) * i, moveAreaHeight + textureComponent.region.getRegionHeight() * scale, 0);
+            transformComponent.position.set(60 + (textureComponent.region.getRegionWidth() * scale + 20) * i, moveAreaHeight + textureComponent.region.getRegionHeight() * scale, 0);
 
             heartEntity.add(heartComponent);
             heartEntity.add(transformComponent);
