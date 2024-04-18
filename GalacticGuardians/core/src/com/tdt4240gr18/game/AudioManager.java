@@ -79,7 +79,7 @@ public class AudioManager {
 
     public void playLaserSound() {
         if (soundsOn) {
-            laserSound.play(0.3f);
+            laserSound.play(0.1f);
         }
     }
 
