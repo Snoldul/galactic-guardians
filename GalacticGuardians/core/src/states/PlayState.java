@@ -20,6 +20,7 @@ import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.entity.components.BulletComponent;
 import com.tdt4240gr18.game.entity.components.CollisionComponent;
 import com.tdt4240gr18.game.entity.components.HeartComponent;
+import com.tdt4240gr18.game.entity.components.ScoreComponent;
 import com.tdt4240gr18.game.entity.systems.BulletControlSystem;
 import com.tdt4240gr18.game.entity.components.EnemyComponent;
 import com.tdt4240gr18.game.entity.components.LivesComponent;
@@ -35,7 +36,9 @@ import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
 import com.tdt4240gr18.game.entity.components.TextureComponent;
 import com.tdt4240gr18.game.ScrollingBackground;
+import com.tdt4240gr18.game.entity.systems.ScoreSystem;
 
+import java.awt.TextComponent;
 
 
 public class PlayState extends State {
@@ -46,14 +49,18 @@ public class PlayState extends State {
     private final ScrollingBackground scrollingBackground = new ScrollingBackground();
     private final Texture player;
     private final Texture enemy;
-    private final Texture bullet;
+
+    private final Texture pauseBtn;
     private final Texture movementSpace;
-    private final Texture heart;
-    private final AudioManager audioManager;
+    private final Rectangle pauseBtnBounds;
     private SpriteBatch sb;
     private Entity playerEntity;
+    private boolean isPaused;
+    private final Texture bullet;
+    private final Texture heart;
+    private final AudioManager audioManager;
+    private Entity scoreEntity;
 
-    private Entity bulletEntity;
     private float spawnTimer;
     private float shotTimer;
 
@@ -63,7 +70,9 @@ public class PlayState extends State {
         audioManager = AudioManager.getInstance();
         player = new Texture("Player.png");
         enemy = new Texture("Enemy.png");
+        pauseBtn = new Texture("pauseBtn.png");
         bullet = new Texture("pew1.png");
+
         movementSpace = new Texture("backdrop.png");
         heart = new Texture("heart.png");
         sb = new SpriteBatch();
@@ -73,8 +82,14 @@ public class PlayState extends State {
         engine.addSystem(new RenderingSystem(sb));
         engine.addSystem(new EnemyControlSystem(this, engine));
         engine.addSystem(new ExplosionSystem(engine));
+        engine.addSystem(new ScoreSystem(engine));
         createPlayer();
-        createBullet();
+
+
+        isPaused = false;
+        pauseBtnBounds = new Rectangle();
+        positionPauseButton();
+        createScore();
         updateHearts();
     }
 
@@ -169,8 +184,23 @@ public class PlayState extends State {
     }
 
 
+    private void positionPauseButton() {
+        // The button width and height are set to 5% of the screen width
+        float btnSize = Gdx.graphics.getWidth() * 0.05f;
+        float btnX = Gdx.graphics.getWidth() - btnSize*2f;
+        float btnY = Gdx.graphics.getHeight() - btnSize*2f;
+
+        // Update the pause button bounds for touch input
+        pauseBtnBounds.set(btnX, btnY, btnSize, btnSize);
+    }
+    public void togglePaused(){
+        isPaused = !isPaused;
+    }
+
+
+
     private void createBullet(){
-        bulletEntity = engine.createEntity();
+        Entity bulletEntity = engine.createEntity();
         TransformComponent transform = engine.createComponent(TransformComponent.class);
         VelocityComponent velocity = engine.createComponent(VelocityComponent.class);
         TextureComponent texture = engine.createComponent(TextureComponent.class);
@@ -202,10 +232,28 @@ public class PlayState extends State {
         audioManager.playLaserSound();
     }
 
+    private void createScore() {
+        scoreEntity = new Entity();
+        ScoreComponent score = engine.createComponent(ScoreComponent.class);
+
+        scoreEntity.add(score);
+
+        engine.addEntity(scoreEntity);
+    }
+
 
     @Override
     protected void handleInput() {
+        if (Gdx.input.isTouched()) {
+            float touchX = Gdx.input.getX();
+            float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
+            // If pause btn is touched then engine.update is not rendered
+            if (pauseBtnBounds.contains(touchX, touchY)) {
+                togglePaused();
+                gsm.push(new PauseState(gsm, this));
+            }
+        }
     }
     private void movePlayer(float xDirection, float yDirection) {
         VelocityComponent velocity = playerEntity.getComponent(VelocityComponent.class);
@@ -217,7 +265,11 @@ public class PlayState extends State {
 
     @Override
     public void update(float dt) {
+
+        handleInput();
+    
         if(!Gdx.input.isTouched()){
+
          movePlayer(0, 0);
         }
         shotTimer += dt;
@@ -243,18 +295,15 @@ public class PlayState extends State {
     }
 
     private void updateHearts() {
-        System.out.println("\n There was a life loss, lives");
         // Create a family to get entities with HeartComponent
         Family heartFamily = Family.all(HeartComponent.class).get();
 
         // Get all entities with HeartComponent
         ImmutableArray<Entity> heartEntities = engine.getEntitiesFor(heartFamily);
-        System.out.println("\n Amount of hearts: " + heartEntities.size());
 
         // Collect entities to remove
         Array<Entity> entitiesToRemove = new Array<>();
         for (Entity entity : heartEntities) {
-            System.out.println("\n removed heart");
             entitiesToRemove.add(entity);
         }
 
@@ -281,7 +330,7 @@ public class PlayState extends State {
             transformComponent.scale.set(scale, scale, scale);
             textureComponent.region = new TextureRegion(heart);
 
-            transformComponent.position.set(60 + (textureComponent.region.getRegionHeight() * scale + 20) * i, moveAreaHeight + textureComponent.region.getRegionHeight() * scale, 0);
+            transformComponent.position.set(60 + (textureComponent.region.getRegionWidth() * scale + 20) * i, moveAreaHeight + textureComponent.region.getRegionHeight() * scale, 0);
 
             heartEntity.add(heartComponent);
             heartEntity.add(transformComponent);
@@ -300,17 +349,22 @@ public class PlayState extends State {
         sb.begin();
         scrollingBackground.render(Gdx.graphics.getDeltaTime(), sb);
         sb.draw(movementSpace, 10, 10, Gdx.graphics.getWidth() - 10, Gdx.graphics.getHeight() / 4f);
+        sb.draw(pauseBtn, pauseBtnBounds.x, pauseBtnBounds.y, pauseBtnBounds.width, pauseBtnBounds.height);
         sb.end();
 
-        engine.update(Gdx.graphics.getDeltaTime());
-    }
 
+        if(!isPaused){
+            engine.update(Gdx.graphics.getDeltaTime());
+        }
+    }
     @Override
     public void dispose() {
         sb.dispose();
         player.dispose();
         enemy.dispose();
         title.dispose();
+        pauseBtn.dispose();
         bullet.dispose();
+
     }
 }
