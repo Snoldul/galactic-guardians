@@ -31,9 +31,15 @@ public class EnemyControlSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         MovementStateComponent stateComp = stateMapper.get(entity);
         MovementPropertiesComponent props = propertiesMapper.get(entity);
+        TransformComponent pos = pm.get(entity);
+        float gameplayScreenHeight = Gdx.graphics.getHeight()/4f;
 
         stateComp.elapsedTime += deltaTime;
 
+        if(pos.position.y < 0 || pos.position.y > gameplayScreenHeight) {
+            getEngine().removeEntity(entity);
+            //TODO: Remove lives from player
+        }
         switch (stateComp.state) {
             case ENTERING:
 
@@ -108,17 +114,15 @@ public class EnemyControlSystem extends IteratingSystem {
         float amplitude = props.amplitude + MathUtils.random(1, 5) * 5;
 
         // Horizontal Oscillation
-        // Using a sine function to create a horizontal oscillating motion.
-        // The amplitude and frequency determine the behavior of this oscillation.
         if(props.oscillationPhase == 0) {
             props.oscillationPhase = MathUtils.random(0, 2 * MathUtils.PI);
         }
         props.oscillationPhase += deltaTime * frequency;
         float newVelocityX = amplitude * MathUtils.sin(props.oscillationPhase);
-        vel.velocity.x = newVelocityX; // Apply delta time scaling to make motion smooth and consistent
+        vel.velocity.x = newVelocityX; // Delta time scaling to make motion smooth and consistent
 
         // Vertical movement
-        // Set a small, constant downward velocity to simulate slow floating.
+        // A small, constant downward velocity to simulate slow floating.
         float constantDownwardVelocity = 10f;
         vel.velocity.y = -constantDownwardVelocity;
 
@@ -147,10 +151,16 @@ public class EnemyControlSystem extends IteratingSystem {
         VelocityComponent vel = vm.get(entity);
         Vector2 playerPosition = playstate.getPlayerPosition();
 
-        if (playerPosition != null) {
-            Vector2 diveDirection = new Vector2(playerPosition.x - pos.position.x, playerPosition.y - pos.position.y).nor();
-            vel.velocity.x = diveDirection.x * props.amplitude * deltaTime;
-            vel.velocity.y = diveDirection.y * props.frequency * deltaTime;
+        // Check if a dive direction has already been set
+        if (props.diveDirection == null && playerPosition != null) {
+            props.diveDirection = new Vector2(playerPosition.x - pos.position.x, playerPosition.y - pos.position.y).nor();
+        }
+
+        // If dive direction is set, use it
+        if (props.diveDirection != null) {
+            float speed = 2500; // Speed of the dive
+            vel.velocity.x = props.diveDirection.x * speed * deltaTime;
+            vel.velocity.y = props.diveDirection.y * speed * deltaTime;
         } else {
             vel.velocity.x = 0;
             vel.velocity.y = 0;
