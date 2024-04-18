@@ -46,12 +46,16 @@ public class PlayState extends State {
     private final ScrollingBackground scrollingBackground = new ScrollingBackground();
     private final Texture player;
     private final Texture enemy;
-    private final Texture bullet;
+
+    private final Texture pauseBtn;
     private final Texture movementSpace;
-    private final Texture heart;
-    private final AudioManager audioManager;
+    private final Rectangle pauseBtnBounds;
     private SpriteBatch sb;
     private Entity playerEntity;
+    private boolean isPaused;
+    private final Texture bullet;
+    private final Texture heart;
+    private final AudioManager audioManager;
     private Entity scoreEntity;
 
     private float spawnTimer;
@@ -63,7 +67,9 @@ public class PlayState extends State {
         audioManager = AudioManager.getInstance();
         player = new Texture("Player.png");
         enemy = new Texture("Enemy.png");
+        pauseBtn = new Texture("pauseBtn.png");
         bullet = new Texture("pew1.png");
+
         movementSpace = new Texture("backdrop.png");
         heart = new Texture("heart.png");
         sb = new SpriteBatch();
@@ -75,6 +81,11 @@ public class PlayState extends State {
         engine.addSystem(new ExplosionSystem(engine));
         engine.addSystem(new ScoreSystem(engine));
         createPlayer();
+
+
+        isPaused = false;
+        pauseBtnBounds = new Rectangle();
+        positionPauseButton();
         createScore();
         updateHearts();
     }
@@ -144,6 +155,21 @@ public class PlayState extends State {
     }
 
 
+    private void positionPauseButton() {
+        // The button width and height are set to 5% of the screen width
+        float btnSize = Gdx.graphics.getWidth() * 0.05f;
+        float btnX = Gdx.graphics.getWidth() - btnSize*2f;
+        float btnY = Gdx.graphics.getHeight() - btnSize*2f;
+
+        // Update the pause button bounds for touch input
+        pauseBtnBounds.set(btnX, btnY, btnSize, btnSize);
+    }
+    public void togglePaused(){
+        isPaused = !isPaused;
+    }
+
+
+
     private void createBullet(){
         Entity bulletEntity = engine.createEntity();
         TransformComponent transform = engine.createComponent(TransformComponent.class);
@@ -189,7 +215,16 @@ public class PlayState extends State {
 
     @Override
     protected void handleInput() {
+        if (Gdx.input.isTouched()) {
+            float touchX = Gdx.input.getX();
+            float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
+            // If pause btn is touched then engine.update is not rendered
+            if (pauseBtnBounds.contains(touchX, touchY)) {
+                togglePaused();
+                gsm.push(new PauseState(gsm, this));
+            }
+        }
     }
     private void movePlayer(float xDirection, float yDirection) {
         VelocityComponent velocity = playerEntity.getComponent(VelocityComponent.class);
@@ -201,7 +236,11 @@ public class PlayState extends State {
 
     @Override
     public void update(float dt) {
+
+        handleInput();
+    
         if(!Gdx.input.isTouched()){
+
          movePlayer(0, 0);
         }
         shotTimer += dt;
@@ -281,17 +320,22 @@ public class PlayState extends State {
         sb.begin();
         scrollingBackground.render(Gdx.graphics.getDeltaTime(), sb);
         sb.draw(movementSpace, 10, 10, Gdx.graphics.getWidth() - 10, Gdx.graphics.getHeight() / 4f);
+        sb.draw(pauseBtn, pauseBtnBounds.x, pauseBtnBounds.y, pauseBtnBounds.width, pauseBtnBounds.height);
         sb.end();
 
-        engine.update(Gdx.graphics.getDeltaTime());
-    }
 
+        if(!isPaused){
+            engine.update(Gdx.graphics.getDeltaTime());
+        }
+    }
     @Override
     public void dispose() {
         sb.dispose();
         player.dispose();
         enemy.dispose();
         title.dispose();
+        pauseBtn.dispose();
         bullet.dispose();
+
     }
 }
