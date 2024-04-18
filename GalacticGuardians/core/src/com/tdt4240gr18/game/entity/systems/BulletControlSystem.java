@@ -75,7 +75,7 @@ public class BulletControlSystem extends IteratingSystem {
         if (bulletCollision.overlaps(playerCollision) && bullet.speed < 0){
             if (playerLives != null) {
                 // Decrement the player's lives by the damage of the bullet
-                playerLives.lives -= bullet.damage;
+                playerLives.decrementLives(bullet.damage);
 
                 // check if its lives are 0
                 if (playerLives.lives <= 0) {
