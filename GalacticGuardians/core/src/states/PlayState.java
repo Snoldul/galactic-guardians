@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.entity.components.BulletComponent;
 import com.tdt4240gr18.game.entity.components.CollisionComponent;
 import com.tdt4240gr18.game.entity.components.HeartComponent;
@@ -48,6 +49,7 @@ public class PlayState extends State {
     private final Texture bullet;
     private final Texture movementSpace;
     private final Texture heart;
+    private final AudioManager audioManager;
     private SpriteBatch sb;
     private Entity playerEntity;
     private Entity scoreEntity;
@@ -58,6 +60,7 @@ public class PlayState extends State {
 
     public PlayState(GameStateManager gsm){
         super(gsm);
+        audioManager = AudioManager.getInstance();
         player = new Texture("Player.png");
         enemy = new Texture("Enemy.png");
         bullet = new Texture("pew1.png");
@@ -169,6 +172,9 @@ public class PlayState extends State {
 
         // Add the entity to the engine
         engine.addEntity(bulletEntity);
+
+        // Play the shooting sound
+        audioManager.playLaserSound();
     }
 
     private void createScore() {

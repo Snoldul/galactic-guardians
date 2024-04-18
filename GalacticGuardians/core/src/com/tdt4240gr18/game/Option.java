@@ -17,11 +17,11 @@ public class Option {
     private BitmapFont font;
     private GlyphLayout layout;
 
-    public Option(String optionText, Texture onTexture, Texture offTexture, Rectangle optionBounds, Rectangle buttonBounds){
+    public Option(String optionText, Texture onTexture, Texture offTexture, Rectangle optionBounds, Rectangle buttonBounds, boolean isOn){
         this.optionText = optionText;
         this.optionBounds = optionBounds;
         this.buttonBounds = buttonBounds;
-        this.isOn = true;
+        this.isOn = isOn;
         font = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
         this.onTexture = onTexture;
         this.offTexture = offTexture;

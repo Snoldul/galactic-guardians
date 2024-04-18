@@ -7,12 +7,10 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
+import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.entity.components.BulletComponent;
 import com.tdt4240gr18.game.entity.components.CollisionComponent;
 import com.tdt4240gr18.game.entity.components.ExplosionComponent;
@@ -25,16 +23,18 @@ import com.tdt4240gr18.game.entity.components.VelocityComponent;
 import com.tdt4240gr18.game.entity.components.EnemyComponent;
 
 public class BulletControlSystem extends IteratingSystem {
-    private ComponentMapper<TransformComponent> pm = ComponentMapper.getFor(TransformComponent.class);
-    private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
+    private final ComponentMapper<TransformComponent> pm = ComponentMapper.getFor(TransformComponent.class);
+    private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
 
     private final Texture explosion1Texture;
-    private PooledEngine engine;
+    private final PooledEngine engine;
+    private final AudioManager audioManager;
 
     public BulletControlSystem(PooledEngine engine) {
         super(Family.all(BulletComponent.class).get());
         this.engine = engine;
         explosion1Texture = new Texture("explosion1.png");
+        audioManager = AudioManager.getInstance();
     }
 
     @Override
@@ -78,6 +78,12 @@ public class BulletControlSystem extends IteratingSystem {
                 // Decrement the player's lives by the damage of the bullet
                 playerLives.decrementLives(bullet.damage);
 
+                // Play death sound
+                audioManager.playDeathSound();
+
+                // Play death sound
+                audioManager.playDeathSound();
+
                 // check if its lives are 0
                 if (playerLives.lives <= 0) {
                     System.out.println("dead");
@@ -120,6 +126,8 @@ public class BulletControlSystem extends IteratingSystem {
                             ScoreComponent scoreComponent = entityWithScore.getComponent(ScoreComponent.class);
                             scoreComponent.incrementScore(1);
                         }
+                        // Play hit sound
+                        audioManager.playHitSound();
 
                     }
 
