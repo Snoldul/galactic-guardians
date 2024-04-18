@@ -83,6 +83,9 @@ public class BulletControlSystem extends IteratingSystem {
                 // Play death sound
                 audioManager.playDeathSound();
 
+                // Play death sound
+                audioManager.playDeathSound();
+
                 // check if its lives are 0
                 if (playerLives.lives <= 0) {
                     System.out.println("dead");
