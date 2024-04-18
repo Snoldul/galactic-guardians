@@ -1,8 +1,11 @@
 package states;
 
+import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,8 +14,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.tdt4240gr18.game.entity.components.BulletComponent;
 import com.tdt4240gr18.game.entity.components.CollisionComponent;
+import com.tdt4240gr18.game.entity.components.HeartComponent;
 import com.tdt4240gr18.game.entity.systems.BulletControlSystem;
 import com.tdt4240gr18.game.entity.components.EnemyComponent;
 import com.tdt4240gr18.game.entity.components.LivesComponent;
@@ -39,6 +44,7 @@ public class PlayState extends State {
     private final Texture enemy;
     private final Texture bullet;
     private final Texture movementSpace;
+    private final Texture heart;
     private SpriteBatch sb;
     private Entity playerEntity;
 
@@ -53,6 +59,7 @@ public class PlayState extends State {
         enemy = new Texture("Enemy.png");
         bullet = new Texture("pew1.png");
         movementSpace = new Texture("backdrop.png");
+        heart = new Texture("heart.png");
         sb = new SpriteBatch();
         engine.addSystem(new PlayerControlSystem());
         engine.addSystem(new BulletControlSystem(engine));
@@ -62,6 +69,7 @@ public class PlayState extends State {
         engine.addSystem(new ExplosionSystem(engine));
         createPlayer();
         createBullet();
+        updateHearts();
     }
 
     private void createPlayer(){
@@ -190,7 +198,63 @@ public class PlayState extends State {
             createBullet();
             shotTimer = 0;
         }
+
+        if (playerEntity.getComponent(LivesComponent.class).lifeLoss){
+            updateHearts();
+            playerEntity.getComponent(LivesComponent.class).lifeLoss = false;
+        }
+
         engine.update(dt);
+    }
+
+    private void updateHearts() {
+        System.out.println("\n There was a life loss, lives");
+        // Create a family to get entities with HeartComponent
+        Family heartFamily = Family.all(HeartComponent.class).get();
+
+        // Get all entities with HeartComponent
+        ImmutableArray<Entity> heartEntities = engine.getEntitiesFor(heartFamily);
+        System.out.println("\n Amount of hearts: " + heartEntities.size());
+
+        // Collect entities to remove
+        Array<Entity> entitiesToRemove = new Array<>();
+        for (Entity entity : heartEntities) {
+            System.out.println("\n removed heart");
+            entitiesToRemove.add(entity);
+        }
+
+// Remove collected entities
+        for (Entity entity : entitiesToRemove) {
+            engine.removeEntity(entity);
+        }
+
+        // Get the number of player's lives
+        LivesComponent livesComponent = playerEntity.getComponent(LivesComponent.class);
+        int numLives = livesComponent.lives;
+
+        Rectangle moveArea = engine.getSystem(PlayerControlSystem.class).getMoveArea();
+        float moveAreaHeight = moveArea.height;
+
+        System.out.print("lives left creating: " + numLives);
+        for (int i = 0; i < numLives; i++) {
+            Entity heartEntity = new Entity();
+            HeartComponent heartComponent = new HeartComponent();
+            TransformComponent transformComponent = new TransformComponent();
+            TextureComponent textureComponent = new TextureComponent();
+
+            float scale = 7f;
+            transformComponent.scale.set(scale, scale, scale);
+            textureComponent.region = new TextureRegion(heart);
+
+            transformComponent.position.set(60 + (textureComponent.region.getRegionHeight() * scale + 20) * i, moveAreaHeight + textureComponent.region.getRegionHeight() * scale, 0);
+
+            heartEntity.add(heartComponent);
+            heartEntity.add(transformComponent);
+            heartEntity.add(textureComponent);
+
+            engine.addEntity(heartEntity);
+        }
+
     }
 
     @Override

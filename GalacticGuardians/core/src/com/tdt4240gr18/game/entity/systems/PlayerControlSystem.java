@@ -90,4 +90,9 @@ public class PlayerControlSystem extends IteratingSystem {
         bounds.x = transform.position.x - ((float) texture.region.getRegionWidth() * transform.scale.x)/2;
         bounds.y = transform.position.y;
     }
+
+    public Rectangle getMoveArea() {
+        return MoveArea;
+    }
+
 }

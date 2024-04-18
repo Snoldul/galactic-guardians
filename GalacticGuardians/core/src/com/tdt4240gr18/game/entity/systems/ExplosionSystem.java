@@ -51,7 +51,6 @@ public class ExplosionSystem extends IteratingSystem {
         TextureComponent texture = entity.getComponent(TextureComponent.class);
 
         int frame = explosion.frame;
-        System.out.println(frame);
 
         if (frame == 6) {
             texture.region = new TextureRegion(explosion2Texture);
