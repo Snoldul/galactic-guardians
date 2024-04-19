@@ -168,8 +168,6 @@ public class PlayState extends State {
         isPaused = !isPaused;
     }
 
-
-
     private void createBullet(){
         Entity bulletEntity = engine.createEntity();
         TransformComponent transform = engine.createComponent(TransformComponent.class);
@@ -238,6 +236,12 @@ public class PlayState extends State {
     public void update(float dt) {
 
         handleInput();
+        if (playerEntity.getComponent(LivesComponent.class).lives <= 0) {
+            // If no lives left, transition to GameOverState
+            gsm.push(new GameOverState(gsm));
+            togglePaused();
+            return; // Exit the update method
+        }
     
         if(!Gdx.input.isTouched()){
 
