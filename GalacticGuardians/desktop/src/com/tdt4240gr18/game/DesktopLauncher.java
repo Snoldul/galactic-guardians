@@ -51,6 +51,11 @@ public class DesktopLauncher {
 
 			}
 
+			@Override
+			public void getScoreFromLeaderboard(String username, OnEntryLoadedListener listener) {
+
+			}
+
 		};
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(60);

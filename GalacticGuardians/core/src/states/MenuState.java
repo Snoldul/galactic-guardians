@@ -65,7 +65,7 @@ public class MenuState extends State{
                 if (button.isClicked(touchX, touchY)) {
                     if (button.getButtonText().equals("Start")) {
                         audioManager.playButtonSound();
-                        gsm.push(new PlayState(gsm));
+                        gsm.push(new PlayState(gsm, databaseInterface));
                     }
                     if (button.getButtonText().equals("Login")) {
                         audioManager.playButtonSound();

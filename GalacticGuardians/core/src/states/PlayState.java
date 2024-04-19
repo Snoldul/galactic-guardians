@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.tdt4240gr18.game.AudioManager;
+import com.tdt4240gr18.game.DatabaseInterface;
 import com.tdt4240gr18.game.entity.components.BulletComponent;
 import com.tdt4240gr18.game.entity.components.CollisionComponent;
 import com.tdt4240gr18.game.entity.components.HeartComponent;
@@ -57,10 +58,16 @@ public class PlayState extends State {
 
     private float spawnTimer;
     private float shotTimer;
+    private final DatabaseInterface databaseInterface;
+    //TRULS jeg vet ikke hvordan jeg får faktisk score, men score skal pushes til GameOverState, bytt ut TRULSFIX med faktisk score
+    private int TRULSFIX = 1;
 
 
-    public PlayState(GameStateManager gsm){
+
+
+    public PlayState(GameStateManager gsm, DatabaseInterface databaseInterface){
         super(gsm);
+        this.databaseInterface = databaseInterface;
         audioManager = AudioManager.getInstance();
         player = new Texture("Player.png");
         enemy = new Texture("Enemy.png");
@@ -79,6 +86,8 @@ public class PlayState extends State {
         engine.addSystem(new ScoreSystem(engine));
         createPlayer();
 
+        databaseInterface.addScoreToLeaderboard("awesomeuser", 69);
+        databaseInterface.addScoreToLeaderboard("johannes", 72);
 
         isPaused = false;
         pauseBtnBounds = new Rectangle();
@@ -244,7 +253,7 @@ public class PlayState extends State {
             if (pauseBtnBounds.contains(touchX, touchY)) {
                 audioManager.playButtonSound();
                 togglePaused();
-                gsm.push(new PauseState(gsm, this));
+                gsm.push(new PauseState(gsm, this, databaseInterface));
             }
         }
     }
@@ -255,7 +264,7 @@ public class PlayState extends State {
         handleInput();
         if (playerEntity.getComponent(LivesComponent.class).lives <= 0) {
             // If no lives left, transition to GameOverState
-            gsm.push(new GameOverState(gsm));
+            gsm.push(new GameOverState(gsm, databaseInterface, TRULSFIX));
             togglePaused();
             return; // Exit the update method
         }
@@ -354,4 +363,5 @@ public class PlayState extends State {
         movementSpace.dispose();
         heart.dispose();
     }
+
 }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.DatabaseInterface;
+import com.tdt4240gr18.game.UserSession;
 
 
 public class GameOverState extends State{
@@ -21,32 +22,26 @@ public class GameOverState extends State{
     private static final float BTN_SCALE_FACTOR = 0.2f;
     private static final float BTN_OFFSET_FACTOR = 0.1f;
     private final AudioManager audioManager;
-    private Texture menu;
-    private Texture yesNoBtn;
+    private final Texture menu;
+    private final Texture yesNoBtn;
     private float menuWidth;
     private float menuHeight;
     private float menuX;
     private float menuY;
-    private float titleWidth;
-    private float titleHeight;
     private float titleX;
     private float titleY;
-    private float btnWidth;
-    private float btnHeight;
-    private float btnX;
-    private float btnY;
-    private float btnOffset;
-    private BitmapFont fontTitle;
-    private BitmapFont fontNewGame;
-    private GlyphLayout layout;
-    private GlyphLayout newGameLayout;
-    private Rectangle btnBounds;
+    private final BitmapFont fontTitle;
+    private final BitmapFont fontNewGame;
+    private final GlyphLayout layout;
+    private final GlyphLayout newGameLayout;
     private Rectangle btnBoundsYes;
     private Rectangle btnBoundsNo;
+    private final DatabaseInterface databaseInterface;
 
 
-    public GameOverState(GameStateManager gsm) {
+    public GameOverState(GameStateManager gsm, DatabaseInterface databaseInterface, int score) {
         super(gsm);
+        this.databaseInterface = databaseInterface;
         audioManager = AudioManager.getInstance();
         menu = new Texture("pauseMenu.png");
         yesNoBtn = new Texture("YesNoBtn.png");
@@ -59,6 +54,26 @@ public class GameOverState extends State{
         initializeMenu();
         initializeTitle();
         initializeButtons();
+        if (UserSession.getInstance().isLoggedIn()) {
+            UserSession.getInstance().setScore(score);
+            databaseInterface.getScoreFromLeaderboard(UserSession.getInstance().getUsername(), new DatabaseInterface.OnEntryLoadedListener() {
+                @Override
+                public void onSuccess(String entry) {
+                    int highScore = Integer.parseInt(entry);
+                    if (score > highScore) {
+                        UserSession.getInstance().setHighScore(score);
+                        databaseInterface.addScoreToLeaderboard(UserSession.getInstance().getUsername(), score);
+                    }
+                }
+
+                @Override
+                public void onFailure(String errorMessage) {
+                    Gdx.app.log("Database Error", errorMessage);
+                }
+            });
+            UserSession.getInstance().setHighScore(score);
+            databaseInterface.addScoreToLeaderboard(UserSession.getInstance().getUsername(), score);
+        }
     }
 
     public void exitToMenu() {
@@ -75,8 +90,8 @@ public class GameOverState extends State{
     }
 
     private void initializeTitle() {
-        titleWidth = layout.width;
-        titleHeight = layout.height;
+        float titleWidth = layout.width;
+        float titleHeight = layout.height;
         titleX = (Gdx.graphics.getWidth() - titleWidth) / 2;
         titleY = menuY + (menuHeight * 0.97f) - titleHeight;
     }
@@ -107,7 +122,7 @@ public class GameOverState extends State{
             if (btnBoundsYes.contains(touchX, touchY)) {
                 audioManager.playButtonSound();
                 exitToMenu();
-                gsm.push(new PlayState(gsm));
+                gsm.push(new PlayState(gsm, databaseInterface));
             }
 
             // Check if the "No" button is clicked

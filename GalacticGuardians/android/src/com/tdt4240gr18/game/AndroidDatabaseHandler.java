@@ -199,4 +199,22 @@ public class AndroidDatabaseHandler implements DatabaseInterface{
 
     }
 
+    @Override
+    public void getScoreFromLeaderboard(String username, OnEntryLoadedListener listener) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("").child("LeaderboardEntries").child(username);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Integer scoreValue = snapshot.child("score").getValue(Integer.class);
+                int score = (scoreValue != null) ? scoreValue : -1;
+                listener.onSuccess(String.valueOf(score));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                System.out.println("Failed to read value: " + error.toException());
+            }
+        });
+    }
+
 }

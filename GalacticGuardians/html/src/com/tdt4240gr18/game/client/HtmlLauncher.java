@@ -54,6 +54,11 @@ public class HtmlLauncher extends GwtApplication {
 
             }
 
+            @Override
+            public void getScoreFromLeaderboard(String username, OnEntryLoadedListener listener) {
+
+            }
+
         };
 
         @Override

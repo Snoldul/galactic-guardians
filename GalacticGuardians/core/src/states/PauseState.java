@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.tdt4240gr18.game.AudioManager;
+import com.tdt4240gr18.game.DatabaseInterface;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,24 +24,24 @@ public class PauseState extends State {
     private final List<Texture> icons;
     private final GlyphLayout layout;
     private final AudioManager audioManager;
-    private Rectangle iconBounds;
 
     private float menuWidth;
     private float menuHeight;
     private float menuX;
     private float menuY;
-    private float titleWidth;
-    private float titleHeight;
     private float titleX;
     private float titleY;
     private float iconSize;
     private float iconOffset;
     private float iconX;
     private float iconY;
-    private PlayState playState;
+    private final PlayState playState;
+    private final DatabaseInterface databaseInterface;
 
-    protected PauseState(GameStateManager gsm, PlayState playState) {
+
+    protected PauseState(GameStateManager gsm, PlayState playState, DatabaseInterface databaseInterface){
         super(gsm);
+        this.databaseInterface = databaseInterface;
         this.playState = playState;
         audioManager = AudioManager.getInstance();
         pauseMenu = new Texture("pauseMenu.png");
@@ -72,7 +73,7 @@ public class PauseState extends State {
                 audioManager.playButtonSound();
                 gsm.popAndReturn().dispose();
                 gsm.popAndReturn().dispose();
-                gsm.push(new PlayState(gsm));
+                gsm.push(new PlayState(gsm, databaseInterface));
             }
         }
     }
@@ -91,8 +92,8 @@ public class PauseState extends State {
     }
 
     private void initializeTitle() {
-        titleWidth = layout.width;
-        titleHeight = layout.height;
+        float titleWidth = layout.width;
+        float titleHeight = layout.height;
         titleX = (Gdx.graphics.getWidth() - titleWidth) / 2;
         titleY = menuY + (menuHeight * 1.07f) - titleHeight;
     }
@@ -102,7 +103,7 @@ public class PauseState extends State {
         iconOffset = Gdx.graphics.getWidth() * ICON_OFFSET_FACTOR;
         iconX = menuX + (menuWidth - ((icons.size() - 1) * iconOffset + icons.size() * iconSize)) / 2;
         iconY = menuY + (menuHeight * 0.4f) - (iconSize / 2);
-        iconBounds = new Rectangle(iconX, iconY, iconSize, iconSize);
+        Rectangle iconBounds = new Rectangle(iconX, iconY, iconSize, iconSize);
     }
 
     @Override

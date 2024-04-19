@@ -22,6 +22,8 @@ public interface DatabaseInterface {
 
     void addScoreToLeaderboard(String username, int score);
 
+    void getScoreFromLeaderboard(String username, OnEntryLoadedListener listener);
+
     interface OnRegistrationListener {
         void onSuccess();
         void onFailure(String errorMessage);

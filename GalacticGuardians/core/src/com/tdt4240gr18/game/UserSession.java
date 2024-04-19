@@ -48,4 +48,7 @@ public class UserSession {
     public void setHighScore(int highScore) {
         this.highScore = highScore;
     }
+
+    public void setScore(int score) {
+    }
 }
