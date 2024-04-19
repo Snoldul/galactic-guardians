@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.DatabaseInterface;
 import com.tdt4240gr18.game.LeaderboardEntry;
 import com.tdt4240gr18.game.MenuButton;
@@ -37,12 +38,14 @@ public class LeaderboardState extends State{
     private final int userYValue;
     private final MenuButton myRankButton, topRankButton;
     private final GlyphLayout loadingLayout;
+    private final AudioManager audioManager;
     private final MenuButton backButton;
 
 
     protected LeaderboardState(GameStateManager gsm, DatabaseInterface databaseInterface) {
         super(gsm);
         this.databaseInterface = databaseInterface;
+        this.audioManager = AudioManager.getInstance();
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
         float buttonWidth = 0.7f;
@@ -143,24 +146,28 @@ public class LeaderboardState extends State{
             float touchY = height - Gdx.input.getY();
 
             if (leftArrow.isClicked(touchX, touchY)) {
+                audioManager.playButtonSound();
                 if (currentPage > 1) {
                     currentPage--;
                     updateEntriesList();
                 }
             }
             else if (rightArrow.isClicked(touchX, touchY)) {
+                audioManager.playButtonSound();
                 if (totalAmountOfEntries - 1 >= entriesPerPage * currentPage) {
                     currentPage++;
                     updateEntriesList();
                 }
             }
             else if (myRankButton.isClicked(touchX, touchY)) {
+                audioManager.playButtonSound();
                 if (currentPage != userRank / entriesPerPage + 1){
                     currentPage = userRank / entriesPerPage + 1;
                     updateEntriesList();
                 }
             }
             else if (topRankButton.isClicked(touchX, touchY)) {
+                audioManager.playButtonSound();
                 if (currentPage != 1) {
                     currentPage = 1;
                     updateEntriesList();
@@ -168,6 +175,15 @@ public class LeaderboardState extends State{
             }
             if (backButton.isClicked(touchX, touchY)) {
                 gsm.popAndReturn().dispose();
+            for (MenuButton button : buttons) {
+                if (button.isClicked(touchX, touchY)) {
+                    if (button.getButtonText().equals("Back")) {
+                        // Burde egentlig bruke push og pop i stedet for set men får ikke til, skjermen blir bare svart etter å pop-e
+                        audioManager.playButtonSound();
+                        gsm.set(new MenuState(gsm, databaseInterface));
+                        dispose();
+                    }
+                }
             }
         }
 

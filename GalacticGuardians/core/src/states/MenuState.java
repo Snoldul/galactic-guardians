@@ -2,6 +2,7 @@ package states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.DatabaseInterface;
 import com.tdt4240gr18.game.MenuButton;
 import com.tdt4240gr18.game.UserSession;
@@ -19,12 +20,14 @@ public class MenuState extends State{
     public final float logoWidthRatio;
     private final List<MenuButton> buttons;
     private final DatabaseInterface databaseInterface;
+    private final AudioManager audioManager;
     private final boolean isAndroid;
     private MenuButton logoutButton;
 
     public MenuState(GameStateManager gsm, DatabaseInterface databaseInterface) {
         super(gsm);
         this.databaseInterface = databaseInterface;
+        this.audioManager = AudioManager.getInstance();
         buttonWidthRatio = 0.7f;
         logoWidthRatio = 0.9f;
         logo = new ggTexture("logo.png", logoWidthRatio);
@@ -61,6 +64,7 @@ public class MenuState extends State{
             for (MenuButton button : buttons) {
                 if (button.isClicked(touchX, touchY)) {
                     if (button.getButtonText().equals("Start")) {
+                        audioManager.playButtonSound();
                         gsm.push(new PlayState(gsm));
                     }
                     if (button.getButtonText().equals("Login")) {
@@ -73,13 +77,15 @@ public class MenuState extends State{
                     }
                     if (button.getButtonText().equals("Leaderboard")) {
                         gsm.push(new LeaderboardState(gsm, databaseInterface));
+                        audioManager.playButtonSound();
                     }
                     if (button.getButtonText().equals("Options")) {
+                        audioManager.playButtonSound();
                         gsm.push(new OptionsState(gsm));
                     }
                     if (button.getButtonText().equals("Quit")) {
                         Gdx.app.exit();
-                    }
+                                            }
                 }
             }
         }

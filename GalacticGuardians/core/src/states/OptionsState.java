@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.Option;
 import com.tdt4240gr18.game.ggTexture;
 
@@ -19,6 +20,7 @@ public class OptionsState extends State{
 
     private BitmapFont fontTitle;
     private final List<Option> options = new ArrayList<>();
+    private final AudioManager audioManager;
 
     private Texture optionsMenu;
     private Rectangle xBtnBounds;
@@ -34,6 +36,7 @@ public class OptionsState extends State{
 
     public OptionsState(GameStateManager gsm) {
         super(gsm);
+        this.audioManager = AudioManager.getInstance();
         initializeTextures();
         initializeDimensions();
         initializeFont();
@@ -66,9 +69,9 @@ public class OptionsState extends State{
     }
 
     public void initializeOptions(){
-        addOption("Music");
-        addOption("Sound");
-        addOption("Tutorial");
+        addOption("Music", audioManager.isMusicOn());
+        addOption("Sound", audioManager.isSoundsOn());
+        addOption("Tutorial", true);
     }
 
     private void initializeXButtonBounds(){
@@ -78,10 +81,10 @@ public class OptionsState extends State{
         float xButtonY = menuPosY - xBtnHeight / 2 + 1030f / 30 / 2; // 1030 is height of current menu, 30 is height of bottow row
         xBtnBounds = new Rectangle(xButtonX, xButtonY, xBtnWidth, xBtnHeight);
     }
-    public void addOption(String text) {
+    public void addOption(String text, boolean soundsOn) {
         Rectangle optionBounds = calculateOptionBounds();
         Rectangle buttonBounds = calculateButtonBounds(optionBounds);
-        options.add(new Option(text, onTexture, offTexture, optionBounds, buttonBounds));
+        options.add(new Option(text, onTexture, offTexture, optionBounds, buttonBounds, soundsOn));
     }
 
     private Rectangle calculateOptionBounds(){
@@ -108,6 +111,7 @@ public class OptionsState extends State{
             float x = Gdx.input.getX();
             float y = height - Gdx.input.getY();
             if (xBtnBounds.contains(x, y)) {
+                audioManager.playButtonSound();
                 // Her burde singleton bli brukt for å lagre options
                 gsm.popAndReturn().dispose();
             }
@@ -115,12 +119,17 @@ public class OptionsState extends State{
                 // If the touch was within the option bounds, toggle the option
                 if (option.contains(x,y)){
                     if (option.getOptionText().equals("Music")) {
+                        audioManager.toggleMuteMusic();
+                        audioManager.playButtonSound();
                         option.toggle();
                     }
                     if (option.getOptionText().equals("Sound")) {
+                        audioManager.toggleMuteSounds();
+                        audioManager.playButtonSound();
                         option.toggle();
                     }
                     if (option.getOptionText().equals("Tutorial")) {
+                        audioManager.playButtonSound();
                         option.toggle();
                     }
 
