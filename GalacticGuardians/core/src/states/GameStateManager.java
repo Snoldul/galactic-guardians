@@ -41,7 +41,7 @@ public class GameStateManager {
     }
 
     public void render(SpriteBatch sb){
-        if(!(states.peek() instanceof PauseState)){
+        if(!(states.peek() instanceof PauseState || states.peek() instanceof GameOverState)){
             states.peek().render(sb);
         } else {
             renderAll(sb);
@@ -69,8 +69,8 @@ public class GameStateManager {
     }
 
     public void renderAll(SpriteBatch sb) {
-        for (State state : states) {
-            state.render(sb);
+        for (int i = 1; i < states.size(); i++) {
+            states.get(i).render(sb);
         }
     }
 
