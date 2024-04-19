@@ -282,6 +282,7 @@ public class PlayState extends State {
 
         engine.update(dt);
     }
+        }
 
     private void updateHearts() {
         // Create a family to get entities with HeartComponent
@@ -295,6 +296,7 @@ public class PlayState extends State {
         for (Entity entity : heartEntities) {
             entitiesToRemove.add(entity);
         }
+
 
 // Remove collected entities
         for (Entity entity : entitiesToRemove) {
