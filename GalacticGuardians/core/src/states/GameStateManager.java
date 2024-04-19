@@ -44,8 +44,8 @@ public class GameStateManager {
     }
 
     public void renderAll(SpriteBatch sb) {
-        for (State state : states) {
-            state.render(sb);
+        for (int i = 1; i < states.size(); i++) {
+            states.get(i).render(sb);
         }
     }
 
