@@ -1,6 +1,5 @@
 package states;
 
-import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
@@ -13,7 +12,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.entity.components.BulletComponent;
@@ -23,6 +22,8 @@ import com.tdt4240gr18.game.entity.components.ScoreComponent;
 import com.tdt4240gr18.game.entity.systems.BulletControlSystem;
 import com.tdt4240gr18.game.entity.components.EnemyComponent;
 import com.tdt4240gr18.game.entity.components.LivesComponent;
+import com.tdt4240gr18.game.entity.components.MovementPropertiesComponent;
+import com.tdt4240gr18.game.entity.components.MovementStateComponent;
 import com.tdt4240gr18.game.entity.components.PlayerComponent;
 import com.tdt4240gr18.game.entity.systems.EnemyControlSystem;
 import com.tdt4240gr18.game.entity.systems.ExplosionSystem;
@@ -35,12 +36,9 @@ import com.tdt4240gr18.game.entity.components.TextureComponent;
 import com.tdt4240gr18.game.ScrollingBackground;
 import com.tdt4240gr18.game.entity.systems.ScoreSystem;
 
-import java.awt.TextComponent;
-
-
 public class PlayState extends State {
 
-    private ComponentMapper<TransformComponent> pm = ComponentMapper.getFor(TransformComponent.class);
+    private final ComponentMapper<TransformComponent> pm = ComponentMapper.getFor(TransformComponent.class);
     private final BitmapFont title = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
     private final PooledEngine engine = new PooledEngine();
     private final ScrollingBackground scrollingBackground = new ScrollingBackground();
@@ -50,13 +48,12 @@ public class PlayState extends State {
     private final Texture pauseBtn;
     private final Texture movementSpace;
     private final Rectangle pauseBtnBounds;
-    private SpriteBatch sb;
+    private final SpriteBatch sb;
     private Entity playerEntity;
     private boolean isPaused;
     private final Texture bullet;
     private final Texture heart;
     private final AudioManager audioManager;
-    private Entity scoreEntity;
 
     private float spawnTimer;
     private float shotTimer;
@@ -77,7 +74,7 @@ public class PlayState extends State {
         engine.addSystem(new BulletControlSystem(engine));
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderingSystem(sb));
-        engine.addSystem(new EnemyControlSystem(engine));
+        engine.addSystem(new EnemyControlSystem(this, engine));
         engine.addSystem(new ExplosionSystem(engine));
         engine.addSystem(new ScoreSystem(engine));
         createPlayer();
@@ -131,10 +128,24 @@ public class PlayState extends State {
         TextureComponent texture = engine.createComponent(TextureComponent.class);
         LivesComponent lives = engine.createComponent(LivesComponent.class);
         EnemyComponent enemyCmp = engine.createComponent(EnemyComponent.class);
+        MovementStateComponent state = engine.createComponent(MovementStateComponent.class);
+        MovementPropertiesComponent properties = engine.createComponent(MovementPropertiesComponent.class);
         CollisionComponent collision = engine.createComponent(CollisionComponent.class);
 
-        // Set component values
+        // Initialize properties
+        properties.amplitude = 10;
+        properties.frequency = 5;
+        properties.verticalSpeed = 10;
+
+        // Set a random target dive Y within the middle 30% of the screen
+        float middleStart = Gdx.graphics.getHeight() * 0.35f;
+        float middleEnd = Gdx.graphics.getHeight() * 0.65f;
+        properties.targetDiveY = MathUtils.random(middleStart, middleEnd);
+
+        // Initialize components
         transform.position.set(x, y, 0);
+        transform.scale.set(5f, 5f, 5f);
+        lives.lives = 4;
         float scale = 5f;
         transform.scale.set(scale,scale,scale);
         lives.lives = 3;
@@ -148,10 +159,22 @@ public class PlayState extends State {
         enemyEntity.add(texture);
         enemyEntity.add(lives);
         enemyEntity.add(enemyCmp);
+        enemyEntity.add(state);
+        enemyEntity.add(properties);
         enemyEntity.add(collision);
 
         // Add the entity to the engine
         engine.addEntity(enemyEntity);
+    }
+    public Vector2 getPlayerPosition() {
+        TransformComponent playerPos;
+        if (playerEntity != null) {
+            playerPos = playerEntity.getComponent(TransformComponent.class);
+        if (playerPos != null) {
+            return new Vector2(playerPos.position.x, playerPos.position.y);
+            }
+        }
+        return null;
     }
 
 
@@ -204,7 +227,7 @@ public class PlayState extends State {
     }
 
     private void createScore() {
-        scoreEntity = new Entity();
+        Entity scoreEntity = new Entity();
         ScoreComponent score = engine.createComponent(ScoreComponent.class);
 
         scoreEntity.add(score);
@@ -226,23 +249,12 @@ public class PlayState extends State {
             }
         }
     }
-    private void movePlayer(float xDirection, float yDirection) {
-        VelocityComponent velocity = playerEntity.getComponent(VelocityComponent.class);
-        if (velocity != null) {
-            float speed = 100; // Adjust to control player speed
-            velocity.velocity.x = xDirection * speed;
-        }
-    }
 
     @Override
     public void update(float dt) {
 
         handleInput();
-    
-        if(!Gdx.input.isTouched()){
 
-         movePlayer(0, 0);
-        }
         shotTimer += dt;
         spawnTimer += dt;
         if(spawnTimer >= 2){
