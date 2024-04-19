@@ -9,16 +9,14 @@ import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.DatabaseInterface;
 import com.tdt4240gr18.game.LeaderboardEntry;
 import com.tdt4240gr18.game.MenuButton;
-import com.tdt4240gr18.game.OnDataLoadedCallback;
+import com.tdt4240gr18.game.UserSession;
 import com.tdt4240gr18.game.ggTexture;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 
 public class LeaderboardState extends State{
-    private final List<MenuButton> buttons;
     private final int width;
     private final int height;
     private final int buttonOffsetY;
@@ -35,12 +33,13 @@ public class LeaderboardState extends State{
     private int currentPage;
     private final int entriesPerPage;
     private int totalAmountOfEntries;
-    private final LeaderboardEntry currentUser;
+    private LeaderboardEntry currentUser;
     private int userRank = 0;
     private final int userYValue;
     private final MenuButton myRankButton, topRankButton;
     private final GlyphLayout loadingLayout;
     private final AudioManager audioManager;
+    private final MenuButton backButton;
 
 
     protected LeaderboardState(GameStateManager gsm, DatabaseInterface databaseInterface) {
@@ -49,13 +48,10 @@ public class LeaderboardState extends State{
         this.audioManager = AudioManager.getInstance();
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
-        buttons = new ArrayList<>();
         float buttonWidth = 0.7f;
         float backdropWidthScale = 0.9f;
         buttonOffsetY = height / 120;
-        buttons.add(addMenuButton("Back", buttonWidth));
-        //buttons.add(addMenuButton("Log in", buttonWidth));
-        this.font = new BitmapFont(Gdx.files.internal("RetroText.fnt"));
+        font = new BitmapFont(Gdx.files.internal("RetroText.fnt"));
         Backdrop = new ggTexture("backdrop.png", backdropWidthScale);
         backdropWidth = Backdrop.getWidth();
         entryoffsetX = (width - Backdrop.getWidth()) / 2;
@@ -66,44 +62,47 @@ public class LeaderboardState extends State{
         setFontScale(font, textScaleTargetWidth, boxWidth);
         String loading = "Loading...";
         loadingLayout = new GlyphLayout(font, loading);
-
-
-        /*databaseInterface.addScoreToLeaderboard("Johannes", 55);
-        for (int i = 10; i < 1000; i += 500){
-            databaseInterface.addScoreToLeaderboard("testForUser" + i, i);
-        }*/
-
         currentPage = 1;
         entriesPerPage = 10;
         float arrowWidthRatio = buttonWidth / 77 * 12;
         int arrowY = (int) (height - ((int) font.getLineHeight() + buttonOffsetY) * (entriesPerPage + 3) - arrowWidthRatio * width / 2 * 3); // 3/2 is the ratio of height/width
         leftArrow = addArrow(true, 0.2f * width - arrowWidthRatio * width / 2, arrowY, arrowWidthRatio);
         rightArrow = addArrow(false, 0.8f * width - arrowWidthRatio * width / 2, arrowY, arrowWidthRatio);
-
-        databaseInterface.getAllEntries(new OnDataLoadedCallback() {
-            @Override
-            public void onDataLoaded(ArrayList<LeaderboardEntry> entries) {
-                allEntries = entries;
-                Collections.sort(allEntries, (t1, t2) -> t2.getScore() - t1.getScore());
-                totalAmountOfEntries = allEntries.size();
-                userRank = allEntries.indexOf(currentUser) + 1;
-            }
-        });
-
-        // Change current user to the user that is logged in
-        currentUser = databaseInterface.getEntry("Johannes");
         userYValue = (int) (height - ((int) font.getLineHeight() + buttonOffsetY) * (entriesPerPage + 1.5f));
-        myRankButton = addSmallButton("Me", buttonWidth / 77*24, (float) 0.38f * width - width * buttonWidth / 77*24 / 2, arrowY);
-        topRankButton = addSmallButton("Top", buttonWidth / 77*24, (float) 0.62f * width - width * buttonWidth / 77*24 / 2, arrowY);
-        myRankButton.setY(arrowY);
+        myRankButton = addSmallButton("Me", buttonWidth / 77*24, 0.38f * width - width * buttonWidth / 77*24 / 2, arrowY);
+        backButton = addBackButton(buttonWidth);
+        if (UserSession.getInstance().isLoggedIn()) {
+            topRankButton = addSmallButton("Top", buttonWidth / 77*24, 0.62f * width - width * buttonWidth / 77*24 / 2, arrowY);}
+        else {
+            topRankButton = addSmallButton("Top", buttonWidth / 77*24, (float) (width - myRankButton.getTexture().getWidth()) / 2, arrowY);
+        }
+/*
+        // TEST DATA
+        databaseInterface.addScoreToLeaderboard("johannes", 255);
+        for (int i = 10; i < 1000; i += 86){
+            databaseInterface.addScoreToLeaderboard("testuser" + i, i);
+        }
+*/
 
-
-
-
-        // Fetch data from database
+        setCurrentUser();
+        databaseInterface.getAllEntries(entries -> {
+            allEntries = entries;
+            Collections.sort(allEntries, (t1, t2) -> t2.getScore() - t1.getScore());
+            totalAmountOfEntries = allEntries.size();
+            userRank = allEntries.indexOf(currentUser) + 1;
+        });
         updateEntriesList();
-
     }
+
+    private void setCurrentUser() {
+        if (UserSession.getInstance().isLoggedIn()) {
+            this.currentUser = databaseInterface.getEntry(UserSession.getInstance().getUsername());
+        }
+        else {
+            this.currentUser = null;
+        }
+    }
+
     private MenuButton addArrow(boolean left, float x, float y, float widthRatio) {
         ggTexture arrowTexture;
         if (left) {
@@ -119,11 +118,10 @@ public class LeaderboardState extends State{
         return new MenuButton(buttonTexture, text, x, y);
     }
 
-    private MenuButton addMenuButton(String text, float buttonWidthRatio) {
+    private MenuButton addBackButton(float buttonWidthRatio) {
         ggTexture buttonTexture = new ggTexture("menuBtn.png", buttonWidthRatio);
         float x = (float) (width - buttonTexture.getWidth()) / 2;
-        float y = (float) buttonOffsetY + buttons.size() * (buttonTexture.getHeight() + buttonOffsetY);
-        return new MenuButton(buttonTexture, text, x, y);
+        return new MenuButton(buttonTexture, "Back", x, (float) buttonOffsetY);
     }
 
 
@@ -156,7 +154,7 @@ public class LeaderboardState extends State{
             }
             else if (rightArrow.isClicked(touchX, touchY)) {
                 audioManager.playButtonSound();
-                if (totalAmountOfEntries >= entriesPerPage * currentPage) {
+                if (totalAmountOfEntries - 1 >= entriesPerPage * currentPage) {
                     currentPage++;
                     updateEntriesList();
                 }
@@ -175,26 +173,17 @@ public class LeaderboardState extends State{
                     updateEntriesList();
                 }
             }
-            for (MenuButton button : buttons) {
-                if (button.isClicked(touchX, touchY)) {
-                    if (button.getButtonText().equals("Back")) {
-                        // Burde egentlig bruke push og pop i stedet for set men får ikke til, skjermen blir bare svart etter å pop-e
-                        audioManager.playButtonSound();
-                        gsm.set(new MenuState(gsm, databaseInterface));
-                        dispose();
-                    }
-                }
+            if (backButton.isClicked(touchX, touchY)) {
+                gsm.popAndReturn().dispose();
             }
         }
 
     }
 
-
     @Override
     public void update(float dt) {
         handleInput();
     }
-
 
     @Override
     public void render(SpriteBatch sb) {
@@ -202,18 +191,20 @@ public class LeaderboardState extends State{
         sb.draw(Backdrop, (float) width /2 - (float) backdropWidth / 2, height - (Backdrop.getHeight() + buttonOffsetY));
         leftArrow.render(sb, false);
         rightArrow.render(sb, false);
-        myRankButton.render(sb);
-        topRankButton.render(sb);
-
-        for (MenuButton button : buttons) {
-            button.render(sb);
+        if (UserSession.getInstance().isLoggedIn()) {
+            myRankButton.render(sb);
         }
+        topRankButton.render(sb);
+        backButton.render(sb);
+
         if (totalAmountOfEntries != 0 && EntriesList != null) {
             for (int i = 0; i < EntriesList.size(); i++) {
                 EntriesList.get(i).render(sb, font, entryoffsetX + (int) (entryMargin * backdropWidth), height - ((int) font.getLineHeight() + buttonOffsetY) * (i + 1), boxWidth, (i + 1) + (currentPage - 1) * entriesPerPage);
             }
             font.setColor(Color.valueOf("ffffb4"));
-            currentUser.render(sb, font, entryoffsetX + (int) (entryMargin * backdropWidth), userYValue, boxWidth, userRank);
+            if (currentUser != null && userRank != -1) {
+                currentUser.render(sb, font, entryoffsetX + (int) (entryMargin * backdropWidth), userYValue, boxWidth, userRank);
+            }
             font.setColor(Color.WHITE);
         }
         else {
@@ -224,9 +215,12 @@ public class LeaderboardState extends State{
 
     @Override
     public void dispose() {
-        for (MenuButton button : buttons) {
-            button.dispose();
-        }
+        Backdrop.dispose();
+        rightArrow.dispose();
+        leftArrow.dispose();
+        myRankButton.dispose();
+        topRankButton.dispose();
+        backButton.dispose();
         font.dispose();
     }
 }

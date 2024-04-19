@@ -16,12 +16,12 @@ import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
 
 public class PlayerControlSystem extends IteratingSystem {
-    private ComponentMapper<TransformComponent> pm = ComponentMapper.getFor(TransformComponent.class);
-    private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
+    private final ComponentMapper<TransformComponent> pm = ComponentMapper.getFor(TransformComponent.class);
+    private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
 
     // Define movement areas for touch input
-    private Rectangle MoveArea;
-    private float speed = 10; // Value to control player speed
+    private final Rectangle MoveArea;
+    private final float speed = 10; // Value to control player speed
 
     public PlayerControlSystem() {
         super(Family.all(TransformComponent.class, VelocityComponent.class, PlayerComponent.class).get());
@@ -87,7 +87,7 @@ public class PlayerControlSystem extends IteratingSystem {
         TextureComponent texture = entity.getComponent(TextureComponent.class);
         CollisionComponent bulletCollision = entity.getComponent(CollisionComponent.class);
         Rectangle bounds = (Rectangle) bulletCollision.bounds;
-        bounds.x = transform.position.x - ((float) texture.region.getRegionWidth() * transform.scale.x)/2;
+        bounds.x = transform.position.x - ((float) texture.region.getRegionWidth() * transform.scale.x)/3;
         bounds.y = transform.position.y;
     }
 

@@ -65,7 +65,9 @@ public class PauseState extends State {
             // Check if the new game icon is clicked
             else if (new Rectangle(iconX + (iconSize + iconOffset), iconY, iconSize, iconSize).contains(touchX, touchY)) {
                 // Start a new game
-                gsm.set(new PlayState(gsm));
+                gsm.popAndReturn().dispose();
+                gsm.popAndReturn().dispose();
+                gsm.push(new PlayState(gsm));
             }
         }
     }

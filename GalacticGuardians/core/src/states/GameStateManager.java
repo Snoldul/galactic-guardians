@@ -19,6 +19,11 @@ public class GameStateManager {
     public void pop(){
         states.pop();
     }
+    public State popAndReturn(){
+        State temp = states.peek();
+        states.pop();
+        return temp;
+    }
 
     public void set(State state){
         states.pop();
@@ -41,6 +46,26 @@ public class GameStateManager {
         } else {
             renderAll(sb);
         }
+    }
+
+    public Object peek() {
+        return states.peek();
+    }
+
+    public State getStateAt(int index) {
+        if (index < 0 || index >= states.size()) {
+            return null;
+        }
+        return states.get(index);
+    }
+
+    public Stack<State> getStack() {
+        return states;
+    }
+
+    public void pushToTop(State state) {
+        states.remove(state);
+        states.push(state);
     }
 
     public void renderAll(SpriteBatch sb) {

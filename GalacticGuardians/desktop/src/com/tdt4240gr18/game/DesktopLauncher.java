@@ -9,6 +9,31 @@ public class DesktopLauncher {
 		DatabaseInterface databaseInterface = new DatabaseInterface() {
 
 			@Override
+			public void registerUser(String email, String password, String username, OnRegistrationListener listener) {
+
+			}
+
+			@Override
+			public void loginUser(String email, String password, OnLoginListener listener) {
+
+			}
+
+			@Override
+			public void logoutUser() {
+
+			}
+
+			@Override
+			public void getEmailByUsername(String username, OnEntryLoadedListener listener) {
+
+			}
+
+			@Override
+			public void getUsernameByEmail(String email, OnEntryLoadedListener listener) {
+
+			}
+
+			@Override
 			public void getAllEntries(OnDataLoadedCallback callback) {
 			}
 

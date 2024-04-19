@@ -12,17 +12,17 @@ import com.badlogic.gdx.utils.Array;
 import java.util.Comparator;
 
 public class RenderingSystem extends SortedIteratingSystem {
-    private ComponentMapper<TransformComponent> trm;
-    private ComponentMapper<TextureComponent> tm;
-    private Array<Entity> renderQueue;
-    private SpriteBatch batch;
+    private final ComponentMapper<TransformComponent> trm;
+    private final ComponentMapper<TextureComponent> tm;
+    private final Array<Entity> renderQueue;
+    private final SpriteBatch batch;
 
     public RenderingSystem(SpriteBatch batch) {
         super(Family.all(TransformComponent.class, TextureComponent.class).get(), new ZComparator());
         trm = ComponentMapper.getFor(TransformComponent.class);
         tm = ComponentMapper.getFor(TextureComponent.class);
 
-        renderQueue = new Array<Entity>();
+        renderQueue = new Array<>();
         this.batch = batch;
     }
 

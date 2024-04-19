@@ -53,7 +53,9 @@ public class MenuButton {
 
     public void dispose() {
         buttonTexture.dispose();
-        font.dispose();
+        if (font != null) {
+            font.dispose();
+        }
     }
 
     public String getButtonText() {
@@ -62,5 +64,13 @@ public class MenuButton {
 
     public void setY(float y) {
         bounds.y = y;
+    }
+
+    public ggTexture getTexture() {
+        return buttonTexture;
+    }
+
+    public int getY() {
+        return (int) bounds.y;
     }
 }
