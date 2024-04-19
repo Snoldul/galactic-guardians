@@ -35,7 +35,7 @@ public class MenuState extends State{
         buttons.add(addButton("Start"));
         buttons.add(addButton("Leaderboard"));
         buttons.add(addButton("Options"));
-        buttons.add(addButton("Quiit"));
+        buttons.add(addButton("Quit"));
     }
 
     private MenuButton addButton(String text) {
@@ -56,8 +56,7 @@ public class MenuState extends State{
                     // Burde egentlig bruke push og pop i stedet for set men får ikke til, skjermen blir bare svart etter å pop-e
                     if (button.getButtonText().equals("Start")) {
                         audioManager.playButtonSound();
-                        gsm.set(new PlayState(gsm));
-                        dispose();
+                        gsm.push(new PlayState(gsm));
                     }
                     if (button.getButtonText().equals("Leaderboard")) {
                         audioManager.playButtonSound();
