@@ -57,7 +57,7 @@ public class OptionsState extends State{
         menuHeight = optionsMenu.getHeight();
         // X and Y pos of optionsMenu
         menuPosX = (width - menuWidth) / 2;
-        menuPosY = (height - menuHeight) / 2 + height * 0.05f;
+        menuPosY = (height - menuHeight);
     }
 
     private void initializeFont(){
@@ -108,7 +108,8 @@ public class OptionsState extends State{
             float x = Gdx.input.getX();
             float y = height - Gdx.input.getY();
             if (xBtnBounds.contains(x, y)) {
-                gsm.pop();
+                // Her burde singleton bli brukt for å lagre options
+                gsm.popAndReturn().dispose();
             }
             for (Option option : options){
                 // If the touch was within the option bounds, toggle the option

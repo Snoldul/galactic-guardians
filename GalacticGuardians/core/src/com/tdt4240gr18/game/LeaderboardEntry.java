@@ -31,13 +31,12 @@ public class LeaderboardEntry {
         //StringBuilder temptextBuilder = new StringBuilder();
 
         for (int i = dotWidth; i < boxWidth - scoreWidth; i += dotWidth) {
-            if (!posReached){
+            if (!posReached) {
                 if (i > UIDWidth + posWidth) {
                     xPos = i;
                     posReached = true;
                 }
-            }
-            else {
+            } else {
                 textBuilder.append(".");
             }
         }
@@ -75,6 +74,7 @@ public class LeaderboardEntry {
     public int getScore() {
         return score;
     }
+
     public void setScore(int score) {
         this.score = score;
     }

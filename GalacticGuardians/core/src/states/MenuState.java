@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.tdt4240gr18.game.DatabaseInterface;
 import com.tdt4240gr18.game.MenuButton;
+import com.tdt4240gr18.game.UserSession;
 import com.tdt4240gr18.game.ggTexture;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class MenuState extends State{
     private final List<MenuButton> buttons;
     private final DatabaseInterface databaseInterface;
     private final boolean isAndroid;
-    private boolean isLoggedIn = false;
+    private MenuButton logoutButton;
 
     public MenuState(GameStateManager gsm, DatabaseInterface databaseInterface) {
         super(gsm);
@@ -33,18 +34,17 @@ public class MenuState extends State{
         BUTTON_OFFSET = height / 120f;
         isAndroid = Gdx.app.getType() == com.badlogic.gdx.Application.ApplicationType.Android;
         buttons.add(addButton("Start"));
-        if (!isLoggedIn) {
+        if (!isAndroid) {
+            buttons.add(addButton("FILLER"));
+        }
+        else {
+            logoutButton = addButton("Logout"); // This button will be "underneath" the login button
             buttons.add(addButton("Login"));
-            //buttons.add(addButton("Register"));
-        } else {
-            //buttons.add(addButton("FILLER"));
-            buttons.add(addButton("Logout"));
         }
         buttons.add(addButton("Leaderboard"));
         buttons.add(addButton("Options"));
         buttons.add(addButton("Quit"));
     }
-
     private MenuButton addButton(String text) {
         ggTexture buttonTexture = new ggTexture("menuBtn.png", buttonWidthRatio);
         float x = (float) (width - buttonTexture.getWidth()) / 2;
@@ -60,16 +60,16 @@ public class MenuState extends State{
 
             for (MenuButton button : buttons) {
                 if (button.isClicked(touchX, touchY)) {
-                    // Burde egentlig bruke push og pop i stedet for set men får ikke til, skjermen blir bare svart etter å pop-e
                     if (button.getButtonText().equals("Start")) {
                         gsm.push(new PlayState(gsm));
                     }
                     if (button.getButtonText().equals("Login")) {
-                        gsm.push(new RegisterUserState(gsm));
-                        isLoggedIn = true;
-                    }
-                    if (button.getButtonText().equals("Logout")) {
-                        isLoggedIn = false;
+                        if (!UserSession.getInstance().isLoggedIn() && isAndroid) {
+                            gsm.push(new LoginState(gsm, databaseInterface));
+                        }
+                        else {
+                            databaseInterface.logoutUser();
+                        }
                     }
                     if (button.getButtonText().equals("Leaderboard")) {
                         gsm.push(new LeaderboardState(gsm, databaseInterface));
@@ -77,7 +77,7 @@ public class MenuState extends State{
                     if (button.getButtonText().equals("Options")) {
                         gsm.push(new OptionsState(gsm));
                     }
-                    if (button.getButtonText().equals("Quiit")) {
+                    if (button.getButtonText().equals("Quit")) {
                         Gdx.app.exit();
                     }
                 }
@@ -96,10 +96,14 @@ public class MenuState extends State{
         sb.begin();
         sb.draw(logo, (float) ((width - logo.getWidth()) / 2),height - logo.getHeight());
         for (MenuButton button : buttons) {
-            if (button.getButtonText().equals("FILLER") || (button.getButtonText().equals("Logout") && (!isLoggedIn || !isAndroid)) || (button.getButtonText().equals("Login") && (isLoggedIn || !isAndroid)) || (button.getButtonText().equals("Register") && (isLoggedIn || !isAndroid))) {
+            if ((button.getButtonText().equals("Login") && (UserSession.getInstance().isLoggedIn() || !isAndroid)) || button.getButtonText().equals("FILLER")){
                 continue;
             }
             button.render(sb);
+        }
+        if (UserSession.getInstance().isLoggedIn()) {
+            // Possibly render username here
+            logoutButton.render(sb);
         }
         sb.end();
     }
