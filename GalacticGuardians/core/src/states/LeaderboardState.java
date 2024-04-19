@@ -175,15 +175,6 @@ public class LeaderboardState extends State{
             }
             if (backButton.isClicked(touchX, touchY)) {
                 gsm.popAndReturn().dispose();
-            for (MenuButton button : buttons) {
-                if (button.isClicked(touchX, touchY)) {
-                    if (button.getButtonText().equals("Back")) {
-                        // Burde egentlig bruke push og pop i stedet for set men får ikke til, skjermen blir bare svart etter å pop-e
-                        audioManager.playButtonSound();
-                        gsm.set(new MenuState(gsm, databaseInterface));
-                        dispose();
-                    }
-                }
             }
         }
 
