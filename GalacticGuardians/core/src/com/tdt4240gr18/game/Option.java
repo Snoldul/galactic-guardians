@@ -9,13 +9,13 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class Option {
     private String optionText;
-    private Rectangle optionBounds;
-    private Rectangle buttonBounds;
+    private final Rectangle optionBounds;
+    private final Rectangle buttonBounds;
     private boolean isOn;
-    private Texture onTexture;
-    private Texture offTexture;
-    private BitmapFont font;
-    private GlyphLayout layout;
+    private final Texture onTexture;
+    private final Texture offTexture;
+    private final BitmapFont font;
+    private final GlyphLayout layout = new GlyphLayout();
 
     public Option(String optionText, Texture onTexture, Texture offTexture, Rectangle optionBounds, Rectangle buttonBounds, boolean isOn){
         this.optionText = optionText;
@@ -32,7 +32,7 @@ public class Option {
         isOn = !isOn;
     }
     public void render(SpriteBatch sb){
-        this.layout = new GlyphLayout(font, optionText);
+        this.layout.setText(font, optionText);
         float textX = optionBounds.x;
         float centerY = optionBounds.y + optionBounds.height / 2;
         float textY = centerY + layout.height / 2;

@@ -8,12 +8,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.Option;
+import com.tdt4240gr18.game.ggTexture;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class OptionsState extends State{
-    private static final float OPTION_OFFSET = 20f;
+    private static final float OPTION_OFFSET = 1.5f;
     private static final float TEXT_SCALE = 3f;
     private static final String TITLE_TEXT = "Options";
 
@@ -21,14 +22,13 @@ public class OptionsState extends State{
     private final List<Option> options = new ArrayList<>();
     private final AudioManager audioManager;
 
-    private GlyphLayout layout;
     private Texture optionsMenu;
     private Rectangle xBtnBounds;
     private Texture xBtn;
     private int width;
     private int height;
-    private float newHeight;
-    private float newWidth;
+    private float menuHeight;
+    private float menuWidth;
     private float menuPosX;
     private float menuPosY;
     private Texture onTexture;
@@ -45,20 +45,22 @@ public class OptionsState extends State{
     }
 
     public void initializeTextures(){
-        optionsMenu = new Texture("optionsBackground.png");
-        xBtn = new Texture("xBtn.png");
-        onTexture = new Texture("onBtn.png");
-        offTexture = new Texture("offBtn.png");
+        float widthRatio = 0.95f;
+        optionsMenu = new ggTexture("optionsBackground.png", widthRatio);
+        float xBtnWidthRatio = 0.15f;
+        xBtn = new ggTexture("xBtn.png", xBtnWidthRatio);
+        onTexture = new ggTexture("onBtn.png", 0.15f);
+        offTexture = new ggTexture("offBtn.png", 0.15f);
     }
 
     public void initializeDimensions(){
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
-        newWidth = width * 0.95f;
-        newHeight = ((float) optionsMenu.getHeight() / (float) optionsMenu.getWidth()) * newWidth;
+        menuWidth = optionsMenu.getWidth();
+        menuHeight = optionsMenu.getHeight();
         // X and Y pos of optionsMenu
-        menuPosX = (width - newWidth) / 2;
-        menuPosY = (height - newHeight) / 2 + height * 0.05f;
+        menuPosX = (width - menuWidth) / 2;
+        menuPosY = (height - menuHeight);
     }
 
     private void initializeFont(){
@@ -73,10 +75,10 @@ public class OptionsState extends State{
     }
 
     private void initializeXButtonBounds(){
-        float xBtnWidth = width * 0.15f;
-        float xBtnHeight = xBtnWidth;
+        float xBtnWidth = xBtn.getWidth();
+        float xBtnHeight = xBtn.getHeight();
         float xButtonX = (width - xBtnWidth) / 2;
-        float xButtonY = (height - menuPosY - newHeight) + xBtnHeight;
+        float xButtonY = menuPosY - xBtnHeight / 2 + 1030f / 30 / 2; // 1030 is height of current menu, 30 is height of bottow row
         xBtnBounds = new Rectangle(xButtonX, xButtonY, xBtnWidth, xBtnHeight);
     }
     public void addOption(String text, boolean soundsOn) {
@@ -87,18 +89,17 @@ public class OptionsState extends State{
 
     private Rectangle calculateOptionBounds(){
         // Space from top of screen to first option
-        float additionalOffset = 400f;
-        float optionHeight = height * 0.1f;
-        float optionWidth = (float) optionsMenu.getWidth();
-        float optionY = menuPosY + newHeight - (options.size() + 1) * (optionHeight + OPTION_OFFSET) - additionalOffset;
-        float optionX = menuPosX + (newWidth-optionWidth)/2;
+        float additionalOffset = 0.25f * menuHeight;
+        float optionWidth = menuWidth * 0.8f;
+        float optionHeight = onTexture.getHeight() * 1.5f;
+        float optionX = menuPosX + (menuWidth - optionWidth) / 2;
+        float optionY = menuPosY + menuHeight - (options.size() + 1) * (optionHeight * OPTION_OFFSET) - additionalOffset;
         return new Rectangle(optionX, optionY, optionWidth, optionHeight);
     }
 
     private Rectangle calculateButtonBounds(Rectangle optionBounds){
-        float scaleButton = 0.65f;
-        float buttonWidth = onTexture.getWidth() * scaleButton;
-        float buttonHeight = offTexture.getHeight() * scaleButton;
+        float buttonWidth = onTexture.getWidth();
+        float buttonHeight = onTexture.getHeight();
         float imageX = optionBounds.x + optionBounds.width - buttonWidth;
         float imageY = optionBounds.y + (optionBounds.height - buttonHeight) / 2;
         return new Rectangle(imageX, imageY, buttonWidth, buttonHeight);
@@ -111,7 +112,8 @@ public class OptionsState extends State{
             float y = height - Gdx.input.getY();
             if (xBtnBounds.contains(x, y)) {
                 audioManager.playButtonSound();
-                gsm.pop();
+                // Her burde singleton bli brukt for å lagre options
+                gsm.popAndReturn().dispose();
             }
             for (Option option : options){
                 // If the touch was within the option bounds, toggle the option
@@ -152,16 +154,16 @@ public class OptionsState extends State{
     }
 
     private void renderOptionsMenu(SpriteBatch sb){
-        sb.draw(optionsMenu,menuPosX, menuPosY, newWidth, newHeight);
+        sb.draw(optionsMenu,menuPosX, menuPosY, menuWidth, menuHeight);
         sb.draw(xBtn, xBtnBounds.x, xBtnBounds.y, xBtnBounds.width, xBtnBounds.height);
     }
 
     private void renderTitle(SpriteBatch sb){
-        layout = new GlyphLayout(fontTitle, TITLE_TEXT);
+        GlyphLayout layout = new GlyphLayout(fontTitle, TITLE_TEXT);
         float titleWidth = layout.width;
         float titleHeight = layout.height;
-        float titleX = menuPosX + ((newWidth - titleWidth) / 2);
-        float titleY = menuPosY + newHeight - titleHeight - newHeight * 0.02f;
+        float titleX = menuPosX + ((menuWidth - titleWidth) / 2);
+        float titleY = menuPosY + menuHeight - titleHeight - menuHeight * 0.02f;
         fontTitle.draw(sb, layout, titleX, titleY);
     }
     private void renderOptions(SpriteBatch sb){
