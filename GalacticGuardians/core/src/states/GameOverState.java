@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.DatabaseInterface;
 
 
@@ -19,6 +20,7 @@ public class GameOverState extends State{
     private static final float NEW_GAME_TEXT_SCALE = 1.7f;
     private static final float BTN_SCALE_FACTOR = 0.2f;
     private static final float BTN_OFFSET_FACTOR = 0.1f;
+    private final AudioManager audioManager;
     private Texture menu;
     private Texture yesNoBtn;
     private float menuWidth;
@@ -45,7 +47,7 @@ public class GameOverState extends State{
 
     public GameOverState(GameStateManager gsm) {
         super(gsm);
-
+        audioManager = AudioManager.getInstance();
         menu = new Texture("pauseMenu.png");
         yesNoBtn = new Texture("YesNoBtn.png");
         fontTitle = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
@@ -57,6 +59,12 @@ public class GameOverState extends State{
         initializeMenu();
         initializeTitle();
         initializeButtons();
+    }
+
+    public void exitToMenu() {
+        while ((gsm.peek() instanceof PlayState || gsm.peek() instanceof GameOverState) && gsm.getStack().size() > 1) {
+            gsm.popAndReturn().dispose();
+        }
     }
 
     private void initializeMenu() {
@@ -97,13 +105,15 @@ public class GameOverState extends State{
 
             // Check if the "Yes" button is clicked
             if (btnBoundsYes.contains(touchX, touchY)) {
-                gsm.set(new PlayState(gsm));
+                audioManager.playButtonSound();
+                exitToMenu();
+                gsm.push(new PlayState(gsm));
             }
 
             // Check if the "No" button is clicked
             if (btnBoundsNo.contains(touchX, touchY)) {
-                gsm.pop();
-                gsm.pop();
+                audioManager.playButtonSound();
+                exitToMenu();
             }
         }
     }

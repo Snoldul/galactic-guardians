@@ -174,6 +174,7 @@ public class LeaderboardState extends State{
                 }
             }
             if (backButton.isClicked(touchX, touchY)) {
+                audioManager.playButtonSound();
                 gsm.popAndReturn().dispose();
             }
         }
@@ -191,7 +192,7 @@ public class LeaderboardState extends State{
         sb.draw(Backdrop, (float) width /2 - (float) backdropWidth / 2, height - (Backdrop.getHeight() + buttonOffsetY));
         leftArrow.render(sb, false);
         rightArrow.render(sb, false);
-        if (UserSession.getInstance().isLoggedIn()) {
+        if (UserSession.getInstance().isLoggedIn() && userRank != -1) {
             myRankButton.render(sb);
         }
         topRankButton.render(sb);

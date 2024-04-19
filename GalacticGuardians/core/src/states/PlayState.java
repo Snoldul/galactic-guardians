@@ -242,6 +242,7 @@ public class PlayState extends State {
 
             // If pause btn is touched then engine.update is not rendered
             if (pauseBtnBounds.contains(touchX, touchY)) {
+                audioManager.playButtonSound();
                 togglePaused();
                 gsm.push(new PauseState(gsm, this));
             }
@@ -259,30 +260,26 @@ public class PlayState extends State {
             return; // Exit the update method
         }
 
-        if(!Gdx.input.isTouched()){
 
-        shotTimer += dt;
-        spawnTimer += dt;
-        if(spawnTimer >= 2){
-         float x = MathUtils.random(0, Gdx.graphics.getWidth());
-            float y = Gdx.graphics.getHeight();
-            createEnemy(x, y);
-            spawnTimer = 0;
-        }
+            shotTimer += dt;
+            spawnTimer += dt;
+            if(spawnTimer >= 2){
+             float x = MathUtils.random(0, Gdx.graphics.getWidth());
+                float y = Gdx.graphics.getHeight();
+                createEnemy(x, y);
+                spawnTimer = 0;
+            }
 
-        if (shotTimer >= playerEntity.getComponent(PlayerComponent.class).firerate){
-            createBullet();
-            shotTimer = 0;
-        }
+            if (shotTimer >= playerEntity.getComponent(PlayerComponent.class).firerate){
+                createBullet();
+                shotTimer = 0;
+            }
 
-        if (playerEntity.getComponent(LivesComponent.class).lifeLoss){
-            updateHearts();
-            playerEntity.getComponent(LivesComponent.class).lifeLoss = false;
-        }
-
-        engine.update(dt);
+            if (playerEntity.getComponent(LivesComponent.class).lifeLoss){
+                updateHearts();
+                playerEntity.getComponent(LivesComponent.class).lifeLoss = false;
+            }
     }
-        }
 
     private void updateHearts() {
         // Create a family to get entities with HeartComponent
@@ -339,14 +336,12 @@ public class PlayState extends State {
 
         sb.begin();
         scrollingBackground.render(Gdx.graphics.getDeltaTime(), sb);
+        if (!isPaused){
+            engine.update(Gdx.graphics.getDeltaTime());
+        }
         sb.draw(movementSpace, 10, 10, Gdx.graphics.getWidth() - 10, Gdx.graphics.getHeight() / 4f);
         sb.draw(pauseBtn, pauseBtnBounds.x, pauseBtnBounds.y, pauseBtnBounds.width, pauseBtnBounds.height);
         sb.end();
-
-
-        if(!isPaused){
-            engine.update(Gdx.graphics.getDeltaTime());
-        }
     }
     @Override
     public void dispose() {
@@ -356,6 +351,7 @@ public class PlayState extends State {
         title.dispose();
         pauseBtn.dispose();
         bullet.dispose();
-
+        movementSpace.dispose();
+        heart.dispose();
     }
 }

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.tdt4240gr18.game.AudioManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +22,7 @@ public class PauseState extends State {
     private final BitmapFont fontTitle;
     private final List<Texture> icons;
     private final GlyphLayout layout;
+    private final AudioManager audioManager;
     private Rectangle iconBounds;
 
     private float menuWidth;
@@ -40,6 +42,7 @@ public class PauseState extends State {
     protected PauseState(GameStateManager gsm, PlayState playState) {
         super(gsm);
         this.playState = playState;
+        audioManager = AudioManager.getInstance();
         pauseMenu = new Texture("pauseMenu.png");
         icons = Arrays.asList(new Texture("playIcon.png"), new Texture("restartIcon.png"));
         fontTitle = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
@@ -59,12 +62,14 @@ public class PauseState extends State {
             // Check if the play icon is clicked
             if (new Rectangle(iconX, iconY, iconSize, iconSize).contains(touchX, touchY)) {
                 // Resume the game
+                audioManager.playButtonSound();
                 playState.togglePaused();
                 gsm.pop();
             }
             // Check if the new game icon is clicked
             else if (new Rectangle(iconX + (iconSize + iconOffset), iconY, iconSize, iconSize).contains(touchX, touchY)) {
                 // Start a new game
+                audioManager.playButtonSound();
                 gsm.popAndReturn().dispose();
                 gsm.popAndReturn().dispose();
                 gsm.push(new PlayState(gsm));

@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Align;
+import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.DatabaseInterface;
 import com.tdt4240gr18.game.MenuButton;
 import com.tdt4240gr18.game.UserSession;
@@ -47,12 +48,14 @@ public class RegisterUserState  extends State{
     private float titleX, titleY;
     private boolean validEmail = false, validUsername = false, validPassword = false;
     private final DatabaseInterface databaseInterface;
+    private final AudioManager audioManager;
     private String invalidEmail, invalidUsername, invalidPassword;
     State tempState;
 
 
     public RegisterUserState(GameStateManager gsm, DatabaseInterface databaseInterface) {
         super(gsm);
+        audioManager = AudioManager.getInstance();
         initializeTextures();
         initializeDimensions();
         initializeFont();
@@ -197,6 +200,7 @@ public class RegisterUserState  extends State{
             float x = Gdx.input.getX();
             float y = height - Gdx.input.getY();
             if (backButton.isClicked(x, y) || xBtnBounds.contains(x, y)) {
+                audioManager.playButtonSound();
                 exitToMenu();
             }
             if (emailBounds.contains(x, y)) {
@@ -209,6 +213,7 @@ public class RegisterUserState  extends State{
                 Gdx.input.getTextInput(passwordListener, "Password", "", "Enter your password");
             }
             if (loginButton.isClicked(x, y)) {
+                audioManager.playButtonSound();
                 tempState = gsm.getStateAt(gsm.getStack().size() - 2);
                 if (tempState instanceof LoginState) {
                     gsm.pushToTop(tempState);
@@ -218,6 +223,7 @@ public class RegisterUserState  extends State{
             }
             if (registerButton.isClicked(x, y)) {
                 if (validEmail && validUsername && validPassword) {
+                    audioManager.playButtonSound();
                     databaseInterface.registerUser(email, username, password, new DatabaseInterface.OnRegistrationListener() {
                         @Override
                         public void onSuccess() {

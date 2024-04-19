@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Align;
+import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.DatabaseInterface;
 import com.tdt4240gr18.game.MenuButton;
 import com.tdt4240gr18.game.UserSession;
@@ -50,10 +51,12 @@ public class LoginState  extends State{
     private final DatabaseInterface databaseInterface;
     State tempState;
     private String username;
+    private final AudioManager audioManager;
 
 
     public LoginState(GameStateManager gsm, DatabaseInterface databaseInterface) {
         super(gsm);
+        audioManager = AudioManager.getInstance();
         initializeTextures();
         initializeDimensions();
         initializeFont();
@@ -192,6 +195,7 @@ public class LoginState  extends State{
             float x = Gdx.input.getX();
             float y = height - Gdx.input.getY();
             if (backButton.isClicked(x, y) || xBtnBounds.contains(x, y)) {
+                audioManager.playButtonSound();
                 exitToMenu();
             }
             if (accountBounds.contains(x, y)) {
@@ -201,6 +205,7 @@ public class LoginState  extends State{
                 Gdx.input.getTextInput(passwordListener, "Password", "", "Enter your password");
             }
             if (registerButton.isClicked(x, y)) {
+                audioManager.playButtonSound();
                 tempState = gsm.getStateAt(gsm.getStack().size() - 2);
                 if (tempState instanceof RegisterUserState) {
                     gsm.pushToTop(tempState);
@@ -210,6 +215,7 @@ public class LoginState  extends State{
             }
             if (loginButton.isClicked(x, y)) {
                 if ((validEmail || validUsername) && validPassword) {
+                    audioManager.playButtonSound();
                     if (validUsername) {
                         username = accountEntry;
                         databaseInterface.getEmailByUsername(accountEntry, new DatabaseInterface.OnEntryLoadedListener() {

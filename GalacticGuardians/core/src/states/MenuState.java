@@ -68,6 +68,7 @@ public class MenuState extends State{
                         gsm.push(new PlayState(gsm));
                     }
                     if (button.getButtonText().equals("Login")) {
+                        audioManager.playButtonSound();
                         if (!UserSession.getInstance().isLoggedIn() && isAndroid) {
                             gsm.push(new LoginState(gsm, databaseInterface));
                         }
@@ -84,8 +85,11 @@ public class MenuState extends State{
                         gsm.push(new OptionsState(gsm));
                     }
                     if (button.getButtonText().equals("Quit")) {
+                        audioManager.playButtonSound();
+                        audioManager.dispose();
+                        dispose();
                         Gdx.app.exit();
-                                            }
+                    }
                 }
             }
         }
