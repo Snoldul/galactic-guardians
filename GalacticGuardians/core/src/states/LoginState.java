@@ -88,8 +88,8 @@ public class LoginState  extends State{
                 }
                 else {
                     validEmail = false;
-                    if (text.length() > 16) {
-                        text = text.substring(0, 16);
+                    if (text.length() > 16 || !isInputValid(text)) {
+                        text = text.replaceAll("[^a-zA-Z0-9?)(\\[\\]{}<>/:%@]", "");
                         validUsername = false;
                     }
                     else {
@@ -187,6 +187,11 @@ public class LoginState  extends State{
         float xButtonX = (width - xBtnWidth) / 2;
         float xButtonY = menuPosY - xBtnHeight / 2 + 1030f / 30 / 2; // 1030 is height of current menu, 30 is height of bottow row
         xBtnBounds = new Rectangle(xButtonX, xButtonY, xBtnWidth, xBtnHeight);
+    }
+
+    public boolean isInputValid(String input) {
+        String regex = "^[a-zA-Z0-9?)(\\[\\]{}<>/\\\\:%@]+$";
+        return input.matches(regex);
     }
 
     @Override

@@ -96,11 +96,16 @@ public class RegisterUserState  extends State{
             public void input(String text) {
                 if (text.length() > 16) {
                     username = text.substring(0, 16).toLowerCase();
-                    validUsername = false;
                 }
                 else {
-                    username = text.toLowerCase();
-                    validUsername = true;
+                    if (!isInputValid(text)) {
+                        username = text.replaceAll("[^a-z0-9?)(\\[\\]{}<>/\\\\:%@]", "");
+                        validUsername = false;
+                    } else {
+                        // Set username to lowercase to avoid case sensitivity in database
+                        username = text.toLowerCase();
+                        validUsername = true;
+                    }
                 }
             }
 
@@ -113,7 +118,7 @@ public class RegisterUserState  extends State{
         passwordListener = new Input.TextInputListener() {
             @Override
             public void input(String text) {
-                validPassword = text.length() >= 8;
+                validPassword = (text.length() >= 8 && text.length() < 30 && isInputValid(text));
                 password = text;
                 asterisks = new char[password.length()];
                 Arrays.fill(asterisks, '*');
@@ -192,6 +197,11 @@ public class RegisterUserState  extends State{
         float xButtonX = (width - xBtnWidth) / 2;
         float xButtonY = menuPosY - xBtnHeight / 2 + 1030f / 30 / 2; // 1030 is height of current menu, 30 is height of bottow row
         xBtnBounds = new Rectangle(xButtonX, xButtonY, xBtnWidth, xBtnHeight);
+    }
+
+    public boolean isInputValid(String input) {
+        String regex = "^[a-zA-Z0-9?)(\\[\\]{}<>/\\\\:%@]+$";
+        return input.matches(regex);
     }
 
     @Override
