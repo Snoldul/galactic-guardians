@@ -127,6 +127,38 @@ public class AndroidDatabaseHandler implements DatabaseInterface{
                 });
     }
 
+    private void checkFieldExists(String field, String value, OnCheckUserListener listener) {
+        mFirestore.collection("users")
+                .whereEqualTo(field, value)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        listener.onSuccess(!task.getResult().isEmpty());
+                    } else {
+                        listener.onFailure(Objects.requireNonNull(task.getException()).getMessage());
+                    }
+                });
+    }
+
+    @Override
+    public void checkIfUserExists(String username, String email, OnCheckUserListener userAlreadyExists) {
+        checkFieldExists("username", username, new OnCheckUserListener() {
+            @Override
+            public void onSuccess(boolean exists) {
+                if (exists) {
+                    userAlreadyExists.onSuccess(true);
+                } else {
+                    checkFieldExists("email", email, userAlreadyExists);
+                }
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {
+                userAlreadyExists.onFailure(errorMessage);
+            }
+        });
+    }
+
     @Override
     public void getAllEntries(OnDataLoadedCallback callback) {
 

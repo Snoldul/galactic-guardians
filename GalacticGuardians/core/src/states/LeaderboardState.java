@@ -69,21 +69,6 @@ public class LeaderboardState extends State{
         leftArrow = addArrow(true, 0.2f * width - arrowWidthRatio * width / 2, arrowY, arrowWidthRatio);
         rightArrow = addArrow(false, 0.8f * width - arrowWidthRatio * width / 2, arrowY, arrowWidthRatio);
         userYValue = (int) (height - ((int) font.getLineHeight() + buttonOffsetY) * (entriesPerPage + 1.5f));
-        myRankButton = addSmallButton("Me", buttonWidth / 77*24, 0.38f * width - width * buttonWidth / 77*24 / 2, arrowY);
-        backButton = addBackButton(buttonWidth);
-        if (UserSession.getInstance().isLoggedIn()) {
-            topRankButton = addSmallButton("Top", buttonWidth / 77*24, 0.62f * width - width * buttonWidth / 77*24 / 2, arrowY);}
-        else {
-            topRankButton = addSmallButton("Top", buttonWidth / 77*24, (float) (width - myRankButton.getTexture().getWidth()) / 2, arrowY);
-        }
-/*
-        // TEST DATA
-        databaseInterface.addScoreToLeaderboard("johannes", 255);
-        for (int i = 10; i < 1000; i += 86){
-            databaseInterface.addScoreToLeaderboard("testuser" + i, i);
-        }
-*/
-
         setCurrentUser();
         databaseInterface.getAllEntries(entries -> {
             allEntries = entries;
@@ -91,7 +76,13 @@ public class LeaderboardState extends State{
             totalAmountOfEntries = allEntries.size();
             userRank = allEntries.indexOf(currentUser) + 1;
         });
-        updateEntriesList();
+        updateEntriesList();myRankButton = addSmallButton("Me", buttonWidth / 77*24, 0.38f * width - width * buttonWidth / 77*24 / 2, arrowY);
+        backButton = addBackButton(buttonWidth);
+        if (UserSession.getInstance().isLoggedIn() && userRank != 0) {
+            topRankButton = addSmallButton("Top", buttonWidth / 77*24, 0.62f * width - width * buttonWidth / 77*24 / 2, arrowY);}
+        else {
+            topRankButton = addSmallButton("Top", buttonWidth / 77*24, (float) (width - myRankButton.getTexture().getWidth()) / 2, arrowY);
+        }
     }
 
     private void setCurrentUser() {
@@ -192,7 +183,7 @@ public class LeaderboardState extends State{
         sb.draw(Backdrop, (float) width /2 - (float) backdropWidth / 2, height - (Backdrop.getHeight() + buttonOffsetY));
         leftArrow.render(sb, false);
         rightArrow.render(sb, false);
-        if (UserSession.getInstance().isLoggedIn() && userRank != -1) {
+        if (UserSession.getInstance().isLoggedIn() && userRank != 0) {
             myRankButton.render(sb);
         }
         topRankButton.render(sb);
@@ -203,7 +194,7 @@ public class LeaderboardState extends State{
                 EntriesList.get(i).render(sb, font, entryoffsetX + (int) (entryMargin * backdropWidth), height - ((int) font.getLineHeight() + buttonOffsetY) * (i + 1), boxWidth, (i + 1) + (currentPage - 1) * entriesPerPage);
             }
             font.setColor(Color.valueOf("ffffb4"));
-            if (currentUser != null && userRank != -1) {
+            if (currentUser != null && userRank != 0) {
                 currentUser.render(sb, font, entryoffsetX + (int) (entryMargin * backdropWidth), userYValue, boxWidth, userRank);
             }
             font.setColor(Color.WHITE);

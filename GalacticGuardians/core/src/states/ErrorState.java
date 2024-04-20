@@ -15,7 +15,7 @@ public class ErrorState extends State {
 
     public ErrorState(GameStateManager gsm, String errMess, BitmapFont font) {
         super(gsm);
-        Gdx.app.log("ErrorState TEST", "Error message: " + errMess);
+        Gdx.app.log("ErrorState", "Error message: " + errMess);
         this.font = font;
         font.getData().setScale(1.5f);
         this.layout = new GlyphLayout(font, errMess, Color.WHITE,width * 0.8f, Align.left,true);

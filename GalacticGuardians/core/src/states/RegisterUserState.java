@@ -224,31 +224,46 @@ public class RegisterUserState  extends State{
             if (registerButton.isClicked(x, y)) {
                 if (validEmail && validUsername && validPassword) {
                     audioManager.playButtonSound();
-                    databaseInterface.registerUser(email, username, password, new DatabaseInterface.OnRegistrationListener() {
+                    databaseInterface.checkIfUserExists(username, email, new DatabaseInterface.OnCheckUserListener() {
                         @Override
-                        public void onSuccess() {
-                            //Log in user
-                            databaseInterface.loginUser(email, password, new DatabaseInterface.OnLoginListener() {
-                                @Override
-                                public void onSuccess() {
-                                    UserSession.getInstance().setUsername(username);
-                                    UserSession.getInstance().setIsLoggedIn(true);
-                                    exitToMenu();
-                                }
+                        public void onSuccess(boolean exists) {
+                            if (exists) {
+                                gsm.push(new ErrorState(gsm, "User already exists", font));
+                            } else {
+                                databaseInterface.registerUser(email, username, password, new DatabaseInterface.OnRegistrationListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        //Log in user
+                                        databaseInterface.loginUser(email, password, new DatabaseInterface.OnLoginListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                UserSession.getInstance().setUsername(username);
+                                                UserSession.getInstance().setIsLoggedIn(true);
+                                                exitToMenu();
+                                            }
 
-                                @Override
-                                public void onFailure(String errorMessage) {
-                                    Gdx.app.log("Register State Error", "Login failed");
-                                    gsm.push(new ErrorState(gsm, "Login after registration failed", font));                                }
-                            });
+                                            @Override
+                                            public void onFailure(String errorMessage) {
+                                                Gdx.app.log("Register State Error", "Login failed");
+                                                gsm.push(new ErrorState(gsm, "Login after registration failed", font));                                }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onFailure(String errorMessage) {
+                                        // Show error message
+                                        gsm.push(new ErrorState(gsm, "Registration failed", font));
+                                    }
+                                });
+                            }
                         }
 
                         @Override
                         public void onFailure(String errorMessage) {
-                            // Show error message
-                            gsm.push(new ErrorState(gsm, "Registration failed", font));
+                            gsm.push(new ErrorState(gsm, "Failed to check if user exists", font));
                         }
                     });
+
                 }
             }
         }

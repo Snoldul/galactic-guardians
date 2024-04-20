@@ -86,9 +86,6 @@ public class PlayState extends State {
         engine.addSystem(new ScoreSystem(engine));
         createPlayer();
 
-        databaseInterface.addScoreToLeaderboard("awesomeuser", 69);
-        databaseInterface.addScoreToLeaderboard("johannes", 72);
-
         isPaused = false;
         pauseBtnBounds = new Rectangle();
         positionPauseButton();
