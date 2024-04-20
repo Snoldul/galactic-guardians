@@ -66,6 +66,10 @@ public class MenuButton {
         bounds.y = y;
     }
 
+    public void setX(float x) {
+        bounds.x = x;
+    }
+
     public ggTexture getTexture() {
         return buttonTexture;
     }

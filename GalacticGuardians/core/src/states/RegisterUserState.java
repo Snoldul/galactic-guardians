@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Align;
 import com.tdt4240gr18.game.AudioManager;
@@ -25,32 +24,39 @@ public class RegisterUserState  extends State{
     private static final float FONT_SCALE = 1.5f;
     private static final String TITLE_TEXT = "Register";
 
+    // Screen dimensions
+    private int width;
+    private int height;
+
+    // UI elements
     private BitmapFont fontTitle, font, invalidFont;
     private GlyphLayout titleLayout, entryLayout;
     private Texture optionsMenu;
-    private Rectangle xBtnBounds;
     private Texture xBtn;
-    private int width;
-    private int height;
+    private MenuButton loginButton, registerButton, backButton;
+
+    // UI layout parameters
     private float menuHeight;
     private float menuWidth;
     private float menuPosX;
     private float menuPosY;
-    private MenuButton loginButton, registerButton, backButton;
-    private String username = "", email = "", password = "", passwordAst = "";
-    private Input.TextInputListener emailListener, usernameListener, passwordListener;
-    private Rectangle emailBounds, usernameBounds, passwordBounds;
+    private float titleX, titleY;
     private float offsetFromTop;
-    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
+    private Rectangle xBtnBounds;
+    private Rectangle emailBounds, usernameBounds, passwordBounds;
+
+    // User input and validation
+    private String username = "", email = "", password = "", passwordAst = "";
+    private boolean validEmail = false, validUsername = false, validPassword = false;
+    private Input.TextInputListener emailListener, usernameListener, passwordListener;
+    private char[] asterisks;
+    private String invalidEmail, invalidUsername, invalidPassword;
+
+    // Other variables
     private GlyphLayout loginPromptLayout;
     private int loginPromtY;
-    private char[] asterisks;
-    private float titleX, titleY;
-    private boolean validEmail = false, validUsername = false, validPassword = false;
     private final DatabaseInterface databaseInterface;
     private final AudioManager audioManager;
-    private String invalidEmail, invalidUsername, invalidPassword;
-    State tempState;
 
 
     public RegisterUserState(GameStateManager gsm, DatabaseInterface databaseInterface) {
@@ -224,7 +230,7 @@ public class RegisterUserState  extends State{
             }
             if (loginButton.isClicked(x, y)) {
                 audioManager.playButtonSound();
-                tempState = gsm.getStateAt(gsm.getStack().size() - 2);
+                State tempState = gsm.getStateAt(gsm.getStack().size() - 2);
                 if (tempState instanceof LoginState) {
                     gsm.pushToTop(tempState);
                 } else {
@@ -333,7 +339,6 @@ public class RegisterUserState  extends State{
     @Override
     public void dispose() {
         optionsMenu.dispose();
-        shapeRenderer.dispose();
         font.dispose();
         fontTitle.dispose();
     }
