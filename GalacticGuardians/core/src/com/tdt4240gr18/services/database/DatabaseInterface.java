@@ -3,6 +3,8 @@ package com.tdt4240gr18.services.database;
 import com.tdt4240gr18.game.misc.LeaderboardEntry;
 import com.tdt4240gr18.utils.OnDataLoadedCallback;
 
+import java.util.List;
+
 public interface DatabaseInterface {
 
     void registerUser(String email, String username, String password, OnRegistrationListener listener);
@@ -19,17 +21,23 @@ public interface DatabaseInterface {
 
 
 
-    void getAllEntries(OnDataLoadedCallback callback);
+    void getAllEntries(OnAllEntriesLoadedListener listener);
 
     void getEntriesPerPage(int pageNumber, int entriesPerPage, OnDataLoadedCallback callback);
 
-    LeaderboardEntry getEntry(String username);
+    void getEntry(String username, onFullEntryLoadedListener listener);
 
     void addScoreToLeaderboard(String username, int score);
 
     void getScoreFromLeaderboard(String username, OnEntryLoadedListener listener);
 
-
+    interface OnAllEntriesLoadedListener {
+        void onAllEntriesLoaded(List<LeaderboardEntry> entries);
+    }
+    interface onFullEntryLoadedListener {
+        void onSuccess(LeaderboardEntry entry);
+        void onFailure(String errorMessage);
+    }
     interface OnRegistrationListener {
         void onSuccess();
         void onFailure(String errorMessage);

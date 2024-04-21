@@ -3,9 +3,8 @@ package com.tdt4240gr18.game.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.tdt4240gr18.services.database.DatabaseInterface;
 import com.tdt4240gr18.GalacticGuardians;
-import com.tdt4240gr18.game.misc.LeaderboardEntry;
+import com.tdt4240gr18.services.database.DatabaseInterface;
 import com.tdt4240gr18.utils.OnDataLoadedCallback;
 
 public class HtmlLauncher extends GwtApplication {
@@ -37,7 +36,13 @@ public class HtmlLauncher extends GwtApplication {
             }
 
             @Override
-            public void getAllEntries(OnDataLoadedCallback callback) {
+            public void checkIfUserExists(String username, String email, OnCheckUserListener userAlreadyExists) {
+
+            }
+
+            @Override
+            public void getAllEntries(OnAllEntriesLoadedListener listener) {
+
             }
 
             @Override
@@ -45,8 +50,7 @@ public class HtmlLauncher extends GwtApplication {
             }
 
             @Override
-            public LeaderboardEntry getEntry(String username) {
-                return null;
+            public void getEntry(String username, onFullEntryLoadedListener listener) {
             }
 
             @Override
