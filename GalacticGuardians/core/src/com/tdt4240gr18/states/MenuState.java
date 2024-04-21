@@ -1,12 +1,12 @@
-package states;
+package com.tdt4240gr18.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.tdt4240gr18.game.AudioManager;
-import com.tdt4240gr18.game.DatabaseInterface;
-import com.tdt4240gr18.game.MenuButton;
-import com.tdt4240gr18.game.UserSession;
-import com.tdt4240gr18.game.ggTexture;
+import com.tdt4240gr18.services.audio.AudioManager;
+import com.tdt4240gr18.services.database.DatabaseInterface;
+import com.tdt4240gr18.ui.MenuButton;
+import com.tdt4240gr18.game.misc.UserSession;
+import com.tdt4240gr18.graphics.ggTexture;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,9 +65,10 @@ public class MenuState extends State{
                 if (button.isClicked(touchX, touchY)) {
                     if (button.getButtonText().equals("Start")) {
                         audioManager.playButtonSound();
-                        gsm.push(new PlayState(gsm));
+                        gsm.push(new PlayState(gsm, databaseInterface));
                     }
                     if (button.getButtonText().equals("Login")) {
+                        audioManager.playButtonSound();
                         if (!UserSession.getInstance().isLoggedIn() && isAndroid) {
                             gsm.push(new LoginState(gsm, databaseInterface));
                         }
@@ -84,8 +85,11 @@ public class MenuState extends State{
                         gsm.push(new OptionsState(gsm));
                     }
                     if (button.getButtonText().equals("Quit")) {
+                        audioManager.playButtonSound();
+                        audioManager.dispose();
+                        dispose();
                         Gdx.app.exit();
-                                            }
+                    }
                 }
             }
         }

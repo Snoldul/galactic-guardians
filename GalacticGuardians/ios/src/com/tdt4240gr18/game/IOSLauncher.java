@@ -2,6 +2,8 @@ package com.tdt4240gr18.game;
 
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
+import com.tdt4240gr18.GalacticGuardians;
+import com.tdt4240gr18.services.database.DatabaseInterface;
 
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.uikit.UIApplication;

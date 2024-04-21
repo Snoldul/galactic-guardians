@@ -1,4 +1,4 @@
-package states;
+package com.tdt4240gr18.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -10,10 +10,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Align;
-import com.tdt4240gr18.game.DatabaseInterface;
-import com.tdt4240gr18.game.MenuButton;
-import com.tdt4240gr18.game.UserSession;
-import com.tdt4240gr18.game.ggTexture;
+import com.tdt4240gr18.services.audio.AudioManager;
+import com.tdt4240gr18.services.database.DatabaseInterface;
+import com.tdt4240gr18.ui.MenuButton;
+import com.tdt4240gr18.game.misc.UserSession;
+import com.tdt4240gr18.graphics.ggTexture;
 
 import java.util.Arrays;
 
@@ -24,36 +25,46 @@ public class LoginState  extends State{
     private static final float FONT_SCALE = 1.5f;
     private static final String TITLE_TEXT = "Login";
 
+    // Screen dimensions
+    private int width;
+    private int height;
+
+    // UI elements
     private BitmapFont fontTitle, font, invalidFont;
     private GlyphLayout titleLayout, entryLayout, infoLayout;
     private Texture optionsMenu;
-    private Rectangle xBtnBounds;
     private Texture xBtn;
-    private int width;
-    private int height;
+    private MenuButton loginButton, registerButton, backButton;
+    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
+
+    // UI layout parameters
     private float menuHeight;
     private float menuWidth;
     private float menuPosX;
     private float menuPosY;
-    private MenuButton loginButton, registerButton, backButton;
+    private float titleX, titleY;
+    private float offsetFromTop;
+    private Rectangle xBtnBounds;
+    private Rectangle accountBounds, passwordBounds;
+
+    // User input and validation
     private String accountEntry = "", password = "", passwordAst = "";
     private String invalidAccount, invalidPassword;
+    private boolean validEmail = false, validUsername = false, validPassword = false;
     private Input.TextInputListener accountListener, passwordListener;
-    private Rectangle accountBounds, passwordBounds;
-    private float offsetFromTop;
-    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
+    private char[] asterisks;
+
+    // Other variables
     private GlyphLayout registerPromptLayout;
     private int registerPromptY;
-    private char[] asterisks;
-    private float titleX, titleY;
-    private boolean validEmail = false, validUsername = false, validPassword = false;
     private final DatabaseInterface databaseInterface;
-    State tempState;
     private String username;
+    private final AudioManager audioManager;
 
 
     public LoginState(GameStateManager gsm, DatabaseInterface databaseInterface) {
         super(gsm);
+        audioManager = AudioManager.getInstance();
         initializeTextures();
         initializeDimensions();
         initializeFont();
@@ -85,8 +96,8 @@ public class LoginState  extends State{
                 }
                 else {
                     validEmail = false;
-                    if (text.length() > 16) {
-                        text = text.substring(0, 16);
+                    if (text.length() > 16 || !isInputValid(text)) {
+                        text = text.replaceAll("[^a-zA-Z0-9?)(\\[\\]{}<>/:%@]", "");
                         validUsername = false;
                     }
                     else {
@@ -186,12 +197,18 @@ public class LoginState  extends State{
         xBtnBounds = new Rectangle(xButtonX, xButtonY, xBtnWidth, xBtnHeight);
     }
 
+    public boolean isInputValid(String input) {
+        String regex = "^[a-zA-Z0-9?)(\\[\\]{}<>/\\\\:%@]+$";
+        return input.matches(regex);
+    }
+
     @Override
     protected void handleInput() {
         if (Gdx.input.justTouched()) {
             float x = Gdx.input.getX();
             float y = height - Gdx.input.getY();
             if (backButton.isClicked(x, y) || xBtnBounds.contains(x, y)) {
+                audioManager.playButtonSound();
                 exitToMenu();
             }
             if (accountBounds.contains(x, y)) {
@@ -201,7 +218,8 @@ public class LoginState  extends State{
                 Gdx.input.getTextInput(passwordListener, "Password", "", "Enter your password");
             }
             if (registerButton.isClicked(x, y)) {
-                tempState = gsm.getStateAt(gsm.getStack().size() - 2);
+                audioManager.playButtonSound();
+                State tempState = gsm.getStateAt(gsm.getStack().size() - 2);
                 if (tempState instanceof RegisterUserState) {
                     gsm.pushToTop(tempState);
                 } else {
@@ -210,6 +228,7 @@ public class LoginState  extends State{
             }
             if (loginButton.isClicked(x, y)) {
                 if ((validEmail || validUsername) && validPassword) {
+                    audioManager.playButtonSound();
                     if (validUsername) {
                         username = accountEntry;
                         databaseInterface.getEmailByUsername(accountEntry, new DatabaseInterface.OnEntryLoadedListener() {

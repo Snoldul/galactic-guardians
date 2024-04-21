@@ -12,6 +12,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.tdt4240gr18.game.misc.LeaderboardEntry;
+import com.tdt4240gr18.game.misc.UserSession;
+import com.tdt4240gr18.services.database.DatabaseInterface;
+import com.tdt4240gr18.utils.OnDataLoadedCallback;
 
 
 import java.util.ArrayList;
@@ -20,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class AndroidDatabaseHandler implements DatabaseInterface{
+public class AndroidDatabaseHandler implements DatabaseInterface {
     private final FirebaseAuth mAuth;
     private final FirebaseFirestore mFirestore;
 
@@ -127,6 +131,38 @@ public class AndroidDatabaseHandler implements DatabaseInterface{
                 });
     }
 
+    private void checkFieldExists(String field, String value, OnCheckUserListener listener) {
+        mFirestore.collection("users")
+                .whereEqualTo(field, value)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        listener.onSuccess(!task.getResult().isEmpty());
+                    } else {
+                        listener.onFailure(Objects.requireNonNull(task.getException()).getMessage());
+                    }
+                });
+    }
+
+    @Override
+    public void checkIfUserExists(String username, String email, OnCheckUserListener userAlreadyExists) {
+        checkFieldExists("username", username, new OnCheckUserListener() {
+            @Override
+            public void onSuccess(boolean exists) {
+                if (exists) {
+                    userAlreadyExists.onSuccess(true);
+                } else {
+                    checkFieldExists("email", email, userAlreadyExists);
+                }
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {
+                userAlreadyExists.onFailure(errorMessage);
+            }
+        });
+    }
+
     @Override
     public void getAllEntries(OnDataLoadedCallback callback) {
 
@@ -197,6 +233,24 @@ public class AndroidDatabaseHandler implements DatabaseInterface{
                 .addOnSuccessListener(aVoid -> System.out.println("Data added successfully!"))
                 .addOnFailureListener(e -> System.out.println("Failed to add data: " + e.getMessage()));
 
+    }
+
+    @Override
+    public void getScoreFromLeaderboard(String username, OnEntryLoadedListener listener) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("").child("LeaderboardEntries").child(username);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Integer scoreValue = snapshot.child("score").getValue(Integer.class);
+                int score = (scoreValue != null) ? scoreValue : -1;
+                listener.onSuccess(String.valueOf(score));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                System.out.println("Failed to read value: " + error.toException());
+            }
+        });
     }
 
 }

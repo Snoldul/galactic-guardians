@@ -1,4 +1,4 @@
-package com.tdt4240gr18.game;
+package com.tdt4240gr18.graphics;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;

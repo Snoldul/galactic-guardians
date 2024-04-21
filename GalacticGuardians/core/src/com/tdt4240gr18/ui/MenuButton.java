@@ -1,10 +1,11 @@
-package com.tdt4240gr18.game;
+package com.tdt4240gr18.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.tdt4240gr18.graphics.ggTexture;
 
 public class MenuButton {
     private final ggTexture buttonTexture;
@@ -64,6 +65,10 @@ public class MenuButton {
 
     public void setY(float y) {
         bounds.y = y;
+    }
+
+    public void setX(float x) {
+        bounds.x = x;
     }
 
     public ggTexture getTexture() {

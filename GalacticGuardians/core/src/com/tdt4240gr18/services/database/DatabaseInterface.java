@@ -1,4 +1,7 @@
-package com.tdt4240gr18.game;
+package com.tdt4240gr18.services.database;
+
+import com.tdt4240gr18.game.misc.LeaderboardEntry;
+import com.tdt4240gr18.utils.OnDataLoadedCallback;
 
 public interface DatabaseInterface {
 
@@ -12,6 +15,8 @@ public interface DatabaseInterface {
 
     void getUsernameByEmail(String email, OnEntryLoadedListener listener);
 
+    void checkIfUserExists(String username, String email, DatabaseInterface.OnCheckUserListener userAlreadyExists);
+
 
 
     void getAllEntries(OnDataLoadedCallback callback);
@@ -21,6 +26,9 @@ public interface DatabaseInterface {
     LeaderboardEntry getEntry(String username);
 
     void addScoreToLeaderboard(String username, int score);
+
+    void getScoreFromLeaderboard(String username, OnEntryLoadedListener listener);
+
 
     interface OnRegistrationListener {
         void onSuccess();
@@ -35,4 +43,8 @@ public interface DatabaseInterface {
         void onFailure(String errorMessage);
     }
 
+    interface OnCheckUserListener {
+        void onSuccess(boolean userExists);
+        void onFailure(String errorMessage);
+    }
 }

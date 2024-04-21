@@ -1,4 +1,4 @@
-package com.tdt4240gr18.game;
+package com.tdt4240gr18.game.misc;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;

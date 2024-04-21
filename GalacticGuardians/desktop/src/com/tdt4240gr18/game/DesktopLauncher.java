@@ -2,6 +2,10 @@ package com.tdt4240gr18.game;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.tdt4240gr18.GalacticGuardians;
+import com.tdt4240gr18.game.misc.LeaderboardEntry;
+import com.tdt4240gr18.services.database.DatabaseInterface;
+import com.tdt4240gr18.utils.OnDataLoadedCallback;
 
 // Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
 public class DesktopLauncher {
@@ -48,6 +52,11 @@ public class DesktopLauncher {
 
 			@Override
 			public void addScoreToLeaderboard(String username, int score) {
+
+			}
+
+			@Override
+			public void getScoreFromLeaderboard(String username, OnEntryLoadedListener listener) {
 
 			}
 

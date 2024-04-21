@@ -3,10 +3,10 @@ package com.tdt4240gr18.game.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.tdt4240gr18.game.DatabaseInterface;
-import com.tdt4240gr18.game.GalacticGuardians;
-import com.tdt4240gr18.game.LeaderboardEntry;
-import com.tdt4240gr18.game.OnDataLoadedCallback;
+import com.tdt4240gr18.services.database.DatabaseInterface;
+import com.tdt4240gr18.GalacticGuardians;
+import com.tdt4240gr18.game.misc.LeaderboardEntry;
+import com.tdt4240gr18.utils.OnDataLoadedCallback;
 
 public class HtmlLauncher extends GwtApplication {
         private final DatabaseInterface databaseInterface = new DatabaseInterface() {
@@ -51,6 +51,11 @@ public class HtmlLauncher extends GwtApplication {
 
             @Override
             public void addScoreToLeaderboard(String username, int score) {
+
+            }
+
+            @Override
+            public void getScoreFromLeaderboard(String username, OnEntryLoadedListener listener) {
 
             }
 

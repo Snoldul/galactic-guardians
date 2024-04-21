@@ -1,4 +1,4 @@
-package states;
+package com.tdt4240gr18.states;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Family;
@@ -14,7 +14,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.tdt4240gr18.game.AudioManager;
+import com.tdt4240gr18.services.audio.AudioManager;
+import com.tdt4240gr18.services.database.DatabaseInterface;
 import com.tdt4240gr18.game.entity.components.BulletComponent;
 import com.tdt4240gr18.game.entity.components.CollisionComponent;
 import com.tdt4240gr18.game.entity.components.HeartComponent;
@@ -33,7 +34,7 @@ import com.tdt4240gr18.game.entity.systems.RenderingSystem;
 import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
 import com.tdt4240gr18.game.entity.components.TextureComponent;
-import com.tdt4240gr18.game.ScrollingBackground;
+import com.tdt4240gr18.graphics.ScrollingBackground;
 import com.tdt4240gr18.game.entity.systems.ScoreSystem;
 
 public class PlayState extends State {
@@ -57,28 +58,33 @@ public class PlayState extends State {
 
     private float spawnTimer;
     private float shotTimer;
+    private final DatabaseInterface databaseInterface;
+    private final Entity scoreEntity = new Entity();
 
 
-    public PlayState(GameStateManager gsm){
+
+
+    public PlayState(GameStateManager gsm, DatabaseInterface databaseInterface){
         super(gsm);
+        this.databaseInterface = databaseInterface;
         audioManager = AudioManager.getInstance();
         player = new Texture("Player.png");
         enemy = new Texture("Enemy.png");
         pauseBtn = new Texture("pauseBtn.png");
         bullet = new Texture("pew1.png");
+        PlayerControlSystem playerControlSystem = new PlayerControlSystem();
 
         movementSpace = new Texture("backdrop.png");
         heart = new Texture("heart.png");
         sb = new SpriteBatch();
-        engine.addSystem(new PlayerControlSystem());
+        engine.addSystem(playerControlSystem);
         engine.addSystem(new BulletControlSystem(engine));
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderingSystem(sb));
-        engine.addSystem(new EnemyControlSystem(this, engine));
+        engine.addSystem(new EnemyControlSystem(this, engine, playerControlSystem));
         engine.addSystem(new ExplosionSystem(engine));
         engine.addSystem(new ScoreSystem(engine));
         createPlayer();
-
 
         isPaused = false;
         pauseBtnBounds = new Rectangle();
@@ -225,7 +231,6 @@ public class PlayState extends State {
     }
 
     private void createScore() {
-        Entity scoreEntity = new Entity();
         ScoreComponent score = engine.createComponent(ScoreComponent.class);
 
         scoreEntity.add(score);
@@ -242,8 +247,9 @@ public class PlayState extends State {
 
             // If pause btn is touched then engine.update is not rendered
             if (pauseBtnBounds.contains(touchX, touchY)) {
+                audioManager.playButtonSound();
                 togglePaused();
-                gsm.push(new PauseState(gsm, this));
+                gsm.push(new PauseState(gsm, this, databaseInterface));
             }
         }
     }
@@ -254,35 +260,31 @@ public class PlayState extends State {
         handleInput();
         if (playerEntity.getComponent(LivesComponent.class).lives <= 0) {
             // If no lives left, transition to GameOverState
-            gsm.push(new GameOverState(gsm));
+            gsm.push(new GameOverState(gsm, databaseInterface, scoreEntity.getComponent(ScoreComponent.class).getScore()));
             togglePaused();
             return; // Exit the update method
         }
 
-        if(!Gdx.input.isTouched()){
 
-        shotTimer += dt;
-        spawnTimer += dt;
-        if(spawnTimer >= 2){
-         float x = MathUtils.random(0, Gdx.graphics.getWidth());
-            float y = Gdx.graphics.getHeight();
-            createEnemy(x, y);
-            spawnTimer = 0;
-        }
+            shotTimer += dt;
+            spawnTimer += dt;
+            if(spawnTimer >= 2){
+             float x = MathUtils.random(0, Gdx.graphics.getWidth());
+                float y = Gdx.graphics.getHeight();
+                createEnemy(x, y);
+                spawnTimer = 0;
+            }
 
-        if (shotTimer >= playerEntity.getComponent(PlayerComponent.class).firerate){
-            createBullet();
-            shotTimer = 0;
-        }
+            if (shotTimer >= playerEntity.getComponent(PlayerComponent.class).firerate){
+                createBullet();
+                shotTimer = 0;
+            }
 
-        if (playerEntity.getComponent(LivesComponent.class).lifeLoss){
-            updateHearts();
-            playerEntity.getComponent(LivesComponent.class).lifeLoss = false;
-        }
-
-        engine.update(dt);
+            if (playerEntity.getComponent(LivesComponent.class).lifeLoss){
+                updateHearts();
+                playerEntity.getComponent(LivesComponent.class).lifeLoss = false;
+            }
     }
-        }
 
     private void updateHearts() {
         // Create a family to get entities with HeartComponent
@@ -339,14 +341,12 @@ public class PlayState extends State {
 
         sb.begin();
         scrollingBackground.render(Gdx.graphics.getDeltaTime(), sb);
+        if (!isPaused){
+            engine.update(Gdx.graphics.getDeltaTime());
+        }
         sb.draw(movementSpace, 10, 10, Gdx.graphics.getWidth() - 10, Gdx.graphics.getHeight() / 4f);
         sb.draw(pauseBtn, pauseBtnBounds.x, pauseBtnBounds.y, pauseBtnBounds.width, pauseBtnBounds.height);
         sb.end();
-
-
-        if(!isPaused){
-            engine.update(Gdx.graphics.getDeltaTime());
-        }
     }
     @Override
     public void dispose() {
@@ -356,6 +356,8 @@ public class PlayState extends State {
         title.dispose();
         pauseBtn.dispose();
         bullet.dispose();
-
+        movementSpace.dispose();
+        heart.dispose();
     }
+
 }

@@ -5,16 +5,19 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.tdt4240gr18.game.entity.components.EnemyComponent;
+import com.tdt4240gr18.game.entity.components.LivesComponent;
 import com.tdt4240gr18.game.entity.components.MovementPropertiesComponent;
 import com.tdt4240gr18.game.entity.components.MovementStateComponent;
+import com.tdt4240gr18.game.entity.components.PlayerComponent;
 import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
 
-import states.PlayState;
+import com.tdt4240gr18.states.PlayState;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -30,26 +33,40 @@ public class EnemyControlSystem extends IteratingSystem {
     private final PlayState playstate;
     private final Texture bullet;
     private final PooledEngine engine;
+    private final PlayerControlSystem playerCS;
 
-    public EnemyControlSystem(PlayState playstate, PooledEngine engine) {
+    public EnemyControlSystem(PlayState playstate, PooledEngine engine, PlayerControlSystem playerControlSystem){
         super(Family.all(TransformComponent.class, VelocityComponent.class, EnemyComponent.class, MovementStateComponent.class, MovementPropertiesComponent.class).get());
         this.playstate = playstate;
         // Specify that this system uses entities with both Transform and Velocity components
         this.engine = engine;
         bullet = new Texture("pew2.png");
+        playerCS = playerControlSystem;
+    }
+    // Return player's move area
+    public Rectangle getPlayerMoveArea(){
+        return playerCS.getMoveArea();
     }
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         MovementStateComponent stateComp = stateMapper.get(entity);
         MovementPropertiesComponent props = propertiesMapper.get(entity);
         TransformComponent pos = pm.get(entity);
-        float gameplayScreenHeight = Gdx.graphics.getHeight()/4f;
+
 
         stateComp.elapsedTime += deltaTime;
 
-        if(pos.position.y < 0) {
+        // check if enemy is below the player's move area
+        if(pos.position.y < getPlayerMoveArea().height) {
             getEngine().removeEntity(entity);
-            //TODO: Remove lives from player
+
+            //Remove Life if enemy gets beyond play area
+            Family playerFamily = Family.all(PlayerComponent.class).get();
+            ImmutableArray<Entity> playerEntities = engine.getEntitiesFor(playerFamily);
+            Entity playerEntity = playerEntities.get(0);
+            LivesComponent playerLives = playerEntity.getComponent(LivesComponent.class);
+
+            playerLives.decrementLives(1);
         }
         switch (stateComp.state) {
             case ENTERING:
@@ -178,7 +195,7 @@ public class EnemyControlSystem extends IteratingSystem {
 
         // Vertical movement
         // A small, constant downward velocity to simulate slow floating.
-        float constantDownwardVelocity = 10f;
+        float constantDownwardVelocity = 20f;
         vel.velocity.y = -constantDownwardVelocity;
 
         // Check if the enemy should dive
@@ -189,6 +206,7 @@ public class EnemyControlSystem extends IteratingSystem {
         }
     }
 
+    //Check if the enemy should dive based on its position
     private boolean shouldDive(Entity entity) {
         TransformComponent pos = pm.get(entity);
         MovementPropertiesComponent props = propertiesMapper.get(entity);
@@ -206,21 +224,26 @@ public class EnemyControlSystem extends IteratingSystem {
         VelocityComponent vel = vm.get(entity);
         Vector2 playerPosition = playstate.getPlayerPosition();
 
-        // Check if a dive direction has already been set
+        // Ensures the dive direction is set towards the player, favoring downward movement
         if (props.diveDirection == null && playerPosition != null) {
-            props.diveDirection = new Vector2(playerPosition.x - pos.position.x, playerPosition.y - pos.position.y).nor();
+            // Creating a direction vector that aims below the player's position
+            props.diveDirection = new Vector2(playerPosition.x - pos.position.x, (playerPosition.y - 50) - pos.position.y).nor();
         }
 
-        // If dive direction is set, use it
+        // If dive direction is set, apply a downward-biased movement
         if (props.diveDirection != null) {
-            float speed = 2500; // Speed of the dive
-            vel.velocity.x = props.diveDirection.x * speed * deltaTime;
-            vel.velocity.y = props.diveDirection.y * speed * deltaTime;
-        } else {
-            vel.velocity.x = 0;
-            vel.velocity.y = 0;
-            // Update position based on velocity
-            pos.position.add(vel.velocity.x * deltaTime, vel.velocity.y * deltaTime, 0);
+            float speed = 10;
+            vel.velocity.x = props.diveDirection.x * speed;
+            vel.velocity.y = props.diveDirection.y * speed * 10; // Biasing downward movement
+        }
+
+        // Update position based on velocity
+        pos.position.add(vel.velocity.x * deltaTime, vel.velocity.y * deltaTime, 0);
+
+        // Boundary check to prevent moving off-screen horizontally
+        float screenWidth = Gdx.graphics.getWidth();
+        if (pos.position.x < 0 || pos.position.x > screenWidth) {
+            props.diveDirection.x = -props.diveDirection.x; // Reverse horizontal direction if off-screen
         }
     }
 }

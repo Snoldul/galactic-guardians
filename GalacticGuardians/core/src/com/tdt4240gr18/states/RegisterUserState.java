@@ -1,4 +1,4 @@
-package states;
+package com.tdt4240gr18.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -7,13 +7,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Align;
-import com.tdt4240gr18.game.DatabaseInterface;
-import com.tdt4240gr18.game.MenuButton;
-import com.tdt4240gr18.game.UserSession;
-import com.tdt4240gr18.game.ggTexture;
+import com.tdt4240gr18.services.audio.AudioManager;
+import com.tdt4240gr18.services.database.DatabaseInterface;
+import com.tdt4240gr18.ui.MenuButton;
+import com.tdt4240gr18.game.misc.UserSession;
+import com.tdt4240gr18.graphics.ggTexture;
 
 import java.util.Arrays;
 
@@ -24,35 +24,44 @@ public class RegisterUserState  extends State{
     private static final float FONT_SCALE = 1.5f;
     private static final String TITLE_TEXT = "Register";
 
+    // Screen dimensions
+    private int width;
+    private int height;
+
+    // UI elements
     private BitmapFont fontTitle, font, invalidFont;
     private GlyphLayout titleLayout, entryLayout;
     private Texture optionsMenu;
-    private Rectangle xBtnBounds;
     private Texture xBtn;
-    private int width;
-    private int height;
+    private MenuButton loginButton, registerButton, backButton;
+
+    // UI layout parameters
     private float menuHeight;
     private float menuWidth;
     private float menuPosX;
     private float menuPosY;
-    private MenuButton loginButton, registerButton, backButton;
-    private String username = "", email = "", password = "", passwordAst = "";
-    private Input.TextInputListener emailListener, usernameListener, passwordListener;
-    private Rectangle emailBounds, usernameBounds, passwordBounds;
+    private float titleX, titleY;
     private float offsetFromTop;
-    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
+    private Rectangle xBtnBounds;
+    private Rectangle emailBounds, usernameBounds, passwordBounds;
+
+    // User input and validation
+    private String username = "", email = "", password = "", passwordAst = "";
+    private boolean validEmail = false, validUsername = false, validPassword = false;
+    private Input.TextInputListener emailListener, usernameListener, passwordListener;
+    private char[] asterisks;
+    private String invalidEmail, invalidUsername, invalidPassword;
+
+    // Other variables
     private GlyphLayout loginPromptLayout;
     private int loginPromtY;
-    private char[] asterisks;
-    private float titleX, titleY;
-    private boolean validEmail = false, validUsername = false, validPassword = false;
     private final DatabaseInterface databaseInterface;
-    private String invalidEmail, invalidUsername, invalidPassword;
-    State tempState;
+    private final AudioManager audioManager;
 
 
     public RegisterUserState(GameStateManager gsm, DatabaseInterface databaseInterface) {
         super(gsm);
+        audioManager = AudioManager.getInstance();
         initializeTextures();
         initializeDimensions();
         initializeFont();
@@ -93,11 +102,16 @@ public class RegisterUserState  extends State{
             public void input(String text) {
                 if (text.length() > 16) {
                     username = text.substring(0, 16).toLowerCase();
-                    validUsername = false;
                 }
                 else {
-                    username = text.toLowerCase();
-                    validUsername = true;
+                    if (!isInputValid(text)) {
+                        username = text.replaceAll("[^a-z0-9?)(\\[\\]{}<>/\\\\:%@]", "");
+                        validUsername = false;
+                    } else {
+                        // Set username to lowercase to avoid case sensitivity in database
+                        username = text.toLowerCase();
+                        validUsername = true;
+                    }
                 }
             }
 
@@ -110,7 +124,7 @@ public class RegisterUserState  extends State{
         passwordListener = new Input.TextInputListener() {
             @Override
             public void input(String text) {
-                validPassword = text.length() >= 8;
+                validPassword = (text.length() >= 8 && text.length() < 30 && isInputValid(text));
                 password = text;
                 asterisks = new char[password.length()];
                 Arrays.fill(asterisks, '*');
@@ -191,12 +205,18 @@ public class RegisterUserState  extends State{
         xBtnBounds = new Rectangle(xButtonX, xButtonY, xBtnWidth, xBtnHeight);
     }
 
+    public boolean isInputValid(String input) {
+        String regex = "^[a-zA-Z0-9?)(\\[\\]{}<>/\\\\:%@]+$";
+        return input.matches(regex);
+    }
+
     @Override
     protected void handleInput() {
         if (Gdx.input.justTouched()) {
             float x = Gdx.input.getX();
             float y = height - Gdx.input.getY();
             if (backButton.isClicked(x, y) || xBtnBounds.contains(x, y)) {
+                audioManager.playButtonSound();
                 exitToMenu();
             }
             if (emailBounds.contains(x, y)) {
@@ -209,7 +229,8 @@ public class RegisterUserState  extends State{
                 Gdx.input.getTextInput(passwordListener, "Password", "", "Enter your password");
             }
             if (loginButton.isClicked(x, y)) {
-                tempState = gsm.getStateAt(gsm.getStack().size() - 2);
+                audioManager.playButtonSound();
+                State tempState = gsm.getStateAt(gsm.getStack().size() - 2);
                 if (tempState instanceof LoginState) {
                     gsm.pushToTop(tempState);
                 } else {
@@ -218,31 +239,47 @@ public class RegisterUserState  extends State{
             }
             if (registerButton.isClicked(x, y)) {
                 if (validEmail && validUsername && validPassword) {
-                    databaseInterface.registerUser(email, username, password, new DatabaseInterface.OnRegistrationListener() {
+                    audioManager.playButtonSound();
+                    databaseInterface.checkIfUserExists(username, email, new DatabaseInterface.OnCheckUserListener() {
                         @Override
-                        public void onSuccess() {
-                            //Log in user
-                            databaseInterface.loginUser(email, password, new DatabaseInterface.OnLoginListener() {
-                                @Override
-                                public void onSuccess() {
-                                    UserSession.getInstance().setUsername(username);
-                                    UserSession.getInstance().setIsLoggedIn(true);
-                                    exitToMenu();
-                                }
+                        public void onSuccess(boolean exists) {
+                            if (exists) {
+                                gsm.push(new ErrorState(gsm, "User already exists", font));
+                            } else {
+                                databaseInterface.registerUser(email, username, password, new DatabaseInterface.OnRegistrationListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        //Log in user
+                                        databaseInterface.loginUser(email, password, new DatabaseInterface.OnLoginListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                UserSession.getInstance().setUsername(username);
+                                                UserSession.getInstance().setIsLoggedIn(true);
+                                                exitToMenu();
+                                            }
 
-                                @Override
-                                public void onFailure(String errorMessage) {
-                                    Gdx.app.log("Register State Error", "Login failed");
-                                    gsm.push(new ErrorState(gsm, "Login after registration failed", font));                                }
-                            });
+                                            @Override
+                                            public void onFailure(String errorMessage) {
+                                                Gdx.app.log("Register State Error", "Login failed");
+                                                gsm.push(new ErrorState(gsm, "Login after registration failed", font));                                }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onFailure(String errorMessage) {
+                                        // Show error message
+                                        gsm.push(new ErrorState(gsm, "Registration failed", font));
+                                    }
+                                });
+                            }
                         }
 
                         @Override
                         public void onFailure(String errorMessage) {
-                            // Show error message
-                            gsm.push(new ErrorState(gsm, "Registration failed", font));
+                            gsm.push(new ErrorState(gsm, "Failed to check if user exists", font));
                         }
                     });
+
                 }
             }
         }
@@ -302,7 +339,6 @@ public class RegisterUserState  extends State{
     @Override
     public void dispose() {
         optionsMenu.dispose();
-        shapeRenderer.dispose();
         font.dispose();
         fontTitle.dispose();
     }

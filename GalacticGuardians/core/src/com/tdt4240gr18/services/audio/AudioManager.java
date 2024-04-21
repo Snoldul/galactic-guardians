@@ -1,4 +1,4 @@
-package com.tdt4240gr18.game;
+package com.tdt4240gr18.services.audio;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
