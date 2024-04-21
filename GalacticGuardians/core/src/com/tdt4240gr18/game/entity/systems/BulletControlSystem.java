@@ -10,7 +10,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.tdt4240gr18.game.AudioManager;
+import com.tdt4240gr18.services.audio.AudioManager;
 import com.tdt4240gr18.game.entity.components.BulletComponent;
 import com.tdt4240gr18.game.entity.components.CollisionComponent;
 import com.tdt4240gr18.game.entity.components.ExplosionComponent;

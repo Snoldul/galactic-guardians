@@ -14,7 +14,7 @@ import com.tdt4240gr18.game.entity.components.MovementStateComponent;
 import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
 
-import states.PlayState;
+import com.tdt4240gr18.states.PlayState;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;

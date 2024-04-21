@@ -1,4 +1,4 @@
-package states;
+package com.tdt4240gr18.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -6,9 +6,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.tdt4240gr18.game.AudioManager;
-import com.tdt4240gr18.game.Option;
-import com.tdt4240gr18.game.ggTexture;
+import com.tdt4240gr18.services.audio.AudioManager;
+import com.tdt4240gr18.game.misc.Option;
+import com.tdt4240gr18.graphics.ggTexture;
 
 import java.util.ArrayList;
 import java.util.List;

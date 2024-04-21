@@ -12,6 +12,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.tdt4240gr18.game.misc.LeaderboardEntry;
+import com.tdt4240gr18.game.misc.UserSession;
+import com.tdt4240gr18.services.database.DatabaseInterface;
+import com.tdt4240gr18.utils.OnDataLoadedCallback;
 
 
 import java.util.ArrayList;
@@ -20,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class AndroidDatabaseHandler implements DatabaseInterface{
+public class AndroidDatabaseHandler implements DatabaseInterface {
     private final FirebaseAuth mAuth;
     private final FirebaseFirestore mFirestore;
 

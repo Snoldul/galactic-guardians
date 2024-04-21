@@ -1,4 +1,7 @@
-package com.tdt4240gr18.game;
+package com.tdt4240gr18.services.database;
+
+import com.tdt4240gr18.game.misc.LeaderboardEntry;
+import com.tdt4240gr18.utils.OnDataLoadedCallback;
 
 public interface DatabaseInterface {
 

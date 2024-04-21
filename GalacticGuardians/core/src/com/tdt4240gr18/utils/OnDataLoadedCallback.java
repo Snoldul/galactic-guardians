@@ -1,4 +1,6 @@
-package com.tdt4240gr18.game;
+package com.tdt4240gr18.utils;
+
+import com.tdt4240gr18.game.misc.LeaderboardEntry;
 
 import java.util.ArrayList;
 

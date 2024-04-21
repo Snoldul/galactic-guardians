@@ -1,12 +1,13 @@
-package com.tdt4240gr18.game;
+package com.tdt4240gr18;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import states.GameStateManager;
-import states.MenuState;
+import com.tdt4240gr18.services.audio.AudioManager;
+import com.tdt4240gr18.services.database.DatabaseInterface;
+import com.tdt4240gr18.states.GameStateManager;
+import com.tdt4240gr18.states.MenuState;
 
 public class GalacticGuardians extends ApplicationAdapter {
 	private final DatabaseInterface databaseInterface;

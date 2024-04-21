@@ -1,12 +1,12 @@
-package states;
+package com.tdt4240gr18.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.tdt4240gr18.game.AudioManager;
-import com.tdt4240gr18.game.DatabaseInterface;
-import com.tdt4240gr18.game.MenuButton;
-import com.tdt4240gr18.game.UserSession;
-import com.tdt4240gr18.game.ggTexture;
+import com.tdt4240gr18.services.audio.AudioManager;
+import com.tdt4240gr18.services.database.DatabaseInterface;
+import com.tdt4240gr18.ui.MenuButton;
+import com.tdt4240gr18.game.misc.UserSession;
+import com.tdt4240gr18.graphics.ggTexture;
 
 import java.util.ArrayList;
 import java.util.List;

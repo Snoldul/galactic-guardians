@@ -1,4 +1,4 @@
-package states;
+package com.tdt4240gr18.states;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Family;
@@ -14,8 +14,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.tdt4240gr18.game.AudioManager;
-import com.tdt4240gr18.game.DatabaseInterface;
+import com.tdt4240gr18.services.audio.AudioManager;
+import com.tdt4240gr18.services.database.DatabaseInterface;
 import com.tdt4240gr18.game.entity.components.BulletComponent;
 import com.tdt4240gr18.game.entity.components.CollisionComponent;
 import com.tdt4240gr18.game.entity.components.HeartComponent;
@@ -34,7 +34,7 @@ import com.tdt4240gr18.game.entity.systems.RenderingSystem;
 import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
 import com.tdt4240gr18.game.entity.components.TextureComponent;
-import com.tdt4240gr18.game.ScrollingBackground;
+import com.tdt4240gr18.graphics.ScrollingBackground;
 import com.tdt4240gr18.game.entity.systems.ScoreSystem;
 
 public class PlayState extends State {

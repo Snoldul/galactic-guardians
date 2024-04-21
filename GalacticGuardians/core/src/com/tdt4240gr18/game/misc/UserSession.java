@@ -1,4 +1,4 @@
-package com.tdt4240gr18.game;
+package com.tdt4240gr18.game.misc;
 
 public class UserSession {
     private static UserSession instance;
