@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.tdt4240gr18.game.AudioManager;
 import com.tdt4240gr18.game.DatabaseInterface;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PauseState extends State {
@@ -18,13 +18,11 @@ public class PauseState extends State {
     private static final float TEXT_SCALE = 4.6f;
     private static final float ICON_SCALE_FACTOR = 0.2f;
     private static final float ICON_OFFSET_FACTOR = 0.1f;
-
     private final Texture pauseMenu;
     private final BitmapFont fontTitle;
     private final List<Texture> icons;
     private final GlyphLayout layout;
     private final AudioManager audioManager;
-
     private float menuWidth;
     private float menuHeight;
     private float menuX;
@@ -45,7 +43,10 @@ public class PauseState extends State {
         this.playState = playState;
         audioManager = AudioManager.getInstance();
         pauseMenu = new Texture("pauseMenu.png");
-        icons = Arrays.asList(new Texture("playIcon.png"), new Texture("restartIcon.png"));
+        icons = new ArrayList<>();
+        // Add new icon
+        icons.add(new Texture("playIcon.png"));
+        icons.add(new Texture("restartIcon.png"));
         fontTitle = new BitmapFont(Gdx.files.internal("RetroTitle.fnt"));
         fontTitle.getData().setScale(TEXT_SCALE);
         layout = new GlyphLayout(fontTitle, TITLE_TEXT);
@@ -103,12 +104,10 @@ public class PauseState extends State {
         iconOffset = Gdx.graphics.getWidth() * ICON_OFFSET_FACTOR;
         iconX = menuX + (menuWidth - ((icons.size() - 1) * iconOffset + icons.size() * iconSize)) / 2;
         iconY = menuY + (menuHeight * 0.4f) - (iconSize / 2);
-        Rectangle iconBounds = new Rectangle(iconX, iconY, iconSize, iconSize);
     }
 
     @Override
     public void render(SpriteBatch sb) {
-
         sb.begin();
         sb.draw(pauseMenu, menuX, menuY, menuWidth, menuHeight);
         fontTitle.draw(sb, layout, titleX, titleY);
@@ -117,11 +116,14 @@ public class PauseState extends State {
         }
         sb.end();
 
-
     }
 
     @Override
     public void dispose() {
         pauseMenu.dispose();
+        for (Texture icon : icons) {
+            icon.dispose();
+        }
+        fontTitle.dispose();
     }
 }
