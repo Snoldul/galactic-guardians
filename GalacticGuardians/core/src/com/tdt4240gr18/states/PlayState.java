@@ -72,15 +72,16 @@ public class PlayState extends State {
         enemy = new Texture("Enemy.png");
         pauseBtn = new Texture("pauseBtn.png");
         bullet = new Texture("pew1.png");
+        PlayerControlSystem playerControlSystem = new PlayerControlSystem();
 
         movementSpace = new Texture("backdrop.png");
         heart = new Texture("heart.png");
         sb = new SpriteBatch();
-        engine.addSystem(new PlayerControlSystem());
+        engine.addSystem(playerControlSystem);
         engine.addSystem(new BulletControlSystem(engine));
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderingSystem(sb));
-        engine.addSystem(new EnemyControlSystem(this, engine));
+        engine.addSystem(new EnemyControlSystem(this, engine, playerControlSystem));
         engine.addSystem(new ExplosionSystem(engine));
         engine.addSystem(new ScoreSystem(engine));
         createPlayer();
