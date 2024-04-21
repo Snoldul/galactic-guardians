@@ -25,31 +25,39 @@ public class LoginState  extends State{
     private static final float FONT_SCALE = 1.5f;
     private static final String TITLE_TEXT = "Login";
 
+    // Screen dimensions
+    private int width;
+    private int height;
+
+    // UI elements
     private BitmapFont fontTitle, font, invalidFont;
     private GlyphLayout titleLayout, entryLayout, infoLayout;
     private Texture optionsMenu;
-    private Rectangle xBtnBounds;
     private Texture xBtn;
-    private int width;
-    private int height;
+    private MenuButton loginButton, registerButton, backButton;
+    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
+
+    // UI layout parameters
     private float menuHeight;
     private float menuWidth;
     private float menuPosX;
     private float menuPosY;
-    private MenuButton loginButton, registerButton, backButton;
+    private float titleX, titleY;
+    private float offsetFromTop;
+    private Rectangle xBtnBounds;
+    private Rectangle accountBounds, passwordBounds;
+
+    // User input and validation
     private String accountEntry = "", password = "", passwordAst = "";
     private String invalidAccount, invalidPassword;
+    private boolean validEmail = false, validUsername = false, validPassword = false;
     private Input.TextInputListener accountListener, passwordListener;
-    private Rectangle accountBounds, passwordBounds;
-    private float offsetFromTop;
-    private final ShapeRenderer shapeRenderer = new ShapeRenderer();
+    private char[] asterisks;
+
+    // Other variables
     private GlyphLayout registerPromptLayout;
     private int registerPromptY;
-    private char[] asterisks;
-    private float titleX, titleY;
-    private boolean validEmail = false, validUsername = false, validPassword = false;
     private final DatabaseInterface databaseInterface;
-    State tempState;
     private String username;
     private final AudioManager audioManager;
 
@@ -88,8 +96,8 @@ public class LoginState  extends State{
                 }
                 else {
                     validEmail = false;
-                    if (text.length() > 16) {
-                        text = text.substring(0, 16);
+                    if (text.length() > 16 || !isInputValid(text)) {
+                        text = text.replaceAll("[^a-zA-Z0-9?)(\\[\\]{}<>/:%@]", "");
                         validUsername = false;
                     }
                     else {
@@ -189,6 +197,11 @@ public class LoginState  extends State{
         xBtnBounds = new Rectangle(xButtonX, xButtonY, xBtnWidth, xBtnHeight);
     }
 
+    public boolean isInputValid(String input) {
+        String regex = "^[a-zA-Z0-9?)(\\[\\]{}<>/\\\\:%@]+$";
+        return input.matches(regex);
+    }
+
     @Override
     protected void handleInput() {
         if (Gdx.input.justTouched()) {
@@ -206,7 +219,7 @@ public class LoginState  extends State{
             }
             if (registerButton.isClicked(x, y)) {
                 audioManager.playButtonSound();
-                tempState = gsm.getStateAt(gsm.getStack().size() - 2);
+                State tempState = gsm.getStateAt(gsm.getStack().size() - 2);
                 if (tempState instanceof RegisterUserState) {
                     gsm.pushToTop(tempState);
                 } else {

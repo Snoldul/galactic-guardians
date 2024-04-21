@@ -55,13 +55,11 @@ public class GameOverState extends State{
         initializeTitle();
         initializeButtons();
         if (UserSession.getInstance().isLoggedIn()) {
-            UserSession.getInstance().setScore(score);
             databaseInterface.getScoreFromLeaderboard(UserSession.getInstance().getUsername(), new DatabaseInterface.OnEntryLoadedListener() {
                 @Override
                 public void onSuccess(String entry) {
                     int highScore = Integer.parseInt(entry);
                     if (score > highScore) {
-                        UserSession.getInstance().setHighScore(score);
                         databaseInterface.addScoreToLeaderboard(UserSession.getInstance().getUsername(), score);
                     }
                 }
@@ -71,8 +69,6 @@ public class GameOverState extends State{
                     Gdx.app.log("Database Error", errorMessage);
                 }
             });
-            UserSession.getInstance().setHighScore(score);
-            databaseInterface.addScoreToLeaderboard(UserSession.getInstance().getUsername(), score);
         }
 
 

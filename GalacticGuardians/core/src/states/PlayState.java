@@ -59,8 +59,7 @@ public class PlayState extends State {
     private float spawnTimer;
     private float shotTimer;
     private final DatabaseInterface databaseInterface;
-    //TRULS jeg vet ikke hvordan jeg får faktisk score, men score skal pushes til GameOverState, bytt ut TRULSFIX med faktisk score
-    private int TRULSFIX = 1;
+    private final Entity scoreEntity = new Entity();
 
 
 
@@ -85,9 +84,6 @@ public class PlayState extends State {
         engine.addSystem(new ExplosionSystem(engine));
         engine.addSystem(new ScoreSystem(engine));
         createPlayer();
-
-        databaseInterface.addScoreToLeaderboard("awesomeuser", 69);
-        databaseInterface.addScoreToLeaderboard("johannes", 72);
 
         isPaused = false;
         pauseBtnBounds = new Rectangle();
@@ -234,7 +230,6 @@ public class PlayState extends State {
     }
 
     private void createScore() {
-        Entity scoreEntity = new Entity();
         ScoreComponent score = engine.createComponent(ScoreComponent.class);
 
         scoreEntity.add(score);
@@ -264,7 +259,7 @@ public class PlayState extends State {
         handleInput();
         if (playerEntity.getComponent(LivesComponent.class).lives <= 0) {
             // If no lives left, transition to GameOverState
-            gsm.push(new GameOverState(gsm, databaseInterface, TRULSFIX));
+            gsm.push(new GameOverState(gsm, databaseInterface, scoreEntity.getComponent(ScoreComponent.class).getScore()));
             togglePaused();
             return; // Exit the update method
         }

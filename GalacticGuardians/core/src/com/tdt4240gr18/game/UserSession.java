@@ -4,8 +4,6 @@ public class UserSession {
     private static UserSession instance;
     private String username;
     private boolean isLoggedIn = false;
-    private int currentScore = 0;
-    private int highScore = 0;
 
     private UserSession() {
     }
@@ -31,24 +29,5 @@ public class UserSession {
 
     public void setIsLoggedIn(boolean isLoggedIn) {
         this.isLoggedIn = isLoggedIn;
-    }
-
-    public int getCurrentScore() {
-        return currentScore;
-    }
-
-    public void setCurrentScore(int currentScore) {
-        this.currentScore = currentScore;
-    }
-
-    public int getHighScore() {
-        return highScore;
-    }
-
-    public void setHighScore(int highScore) {
-        this.highScore = highScore;
-    }
-
-    public void setScore(int score) {
     }
 }
