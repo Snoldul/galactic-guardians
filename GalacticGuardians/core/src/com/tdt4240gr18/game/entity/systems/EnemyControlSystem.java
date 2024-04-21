@@ -5,12 +5,15 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.tdt4240gr18.game.entity.components.EnemyComponent;
+import com.tdt4240gr18.game.entity.components.LivesComponent;
 import com.tdt4240gr18.game.entity.components.MovementPropertiesComponent;
 import com.tdt4240gr18.game.entity.components.MovementStateComponent;
+import com.tdt4240gr18.game.entity.components.PlayerComponent;
 import com.tdt4240gr18.game.entity.components.TransformComponent;
 import com.tdt4240gr18.game.entity.components.VelocityComponent;
 
@@ -30,26 +33,39 @@ public class EnemyControlSystem extends IteratingSystem {
     private final PlayState playstate;
     private final Texture bullet;
     private final PooledEngine engine;
+    private final PlayerControlSystem playerCS;
 
-    public EnemyControlSystem(PlayState playstate, PooledEngine engine) {
+    public EnemyControlSystem(PlayState playstate, PooledEngine engine, PlayerControlSystem playerControlSystem){
         super(Family.all(TransformComponent.class, VelocityComponent.class, EnemyComponent.class, MovementStateComponent.class, MovementPropertiesComponent.class).get());
         this.playstate = playstate;
         // Specify that this system uses entities with both Transform and Velocity components
         this.engine = engine;
         bullet = new Texture("pew2.png");
+        playerCS = playerControlSystem;
+    }
+    public Rectangle getPlayerMoveArea(){
+        return playerCS.getMoveArea();
     }
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         MovementStateComponent stateComp = stateMapper.get(entity);
         MovementPropertiesComponent props = propertiesMapper.get(entity);
         TransformComponent pos = pm.get(entity);
-        float gameplayScreenHeight = Gdx.graphics.getHeight()/4f;
+
 
         stateComp.elapsedTime += deltaTime;
 
-        if(pos.position.y < 0) {
+        if(pos.position.y < getPlayerMoveArea().height) {
             getEngine().removeEntity(entity);
-            //TODO: Remove lives from player
+            System.out.println("Enemy has been removed");
+
+            //Remove Life if enemy gets beyond play area
+            Family playerFamily = Family.all(PlayerComponent.class).get();
+            ImmutableArray<Entity> playerEntities = engine.getEntitiesFor(playerFamily);
+            Entity playerEntity = playerEntities.get(0);
+            LivesComponent playerLives = playerEntity.getComponent(LivesComponent.class);
+
+            playerLives.decrementLives(1);
         }
         switch (stateComp.state) {
             case ENTERING:
