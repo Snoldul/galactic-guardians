@@ -22,4 +22,4 @@ Galactic Guardians is designed to be straightforward and fun, offering players a
 While this project is considered complete as it has been delivered for the TDT4240 course, you are free to fork the project and make your own adjustments. Feel free to explore the code and implement new features or improvements as you see fit.
 
 ## License
-This project is licensed under the [MIT License](LICENSE.txt)
+This project is licensed under the [MIT License](LICENSE)
