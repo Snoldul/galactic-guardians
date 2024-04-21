@@ -71,7 +71,6 @@ public class OptionsState extends State{
     public void initializeOptions(){
         addOption("Music", audioManager.isMusicOn());
         addOption("Sound", audioManager.isSoundsOn());
-        addOption("Tutorial", true);
     }
 
     private void initializeXButtonBounds(){
@@ -125,10 +124,6 @@ public class OptionsState extends State{
                     }
                     if (option.getOptionText().equals("Sound")) {
                         audioManager.toggleMuteSounds();
-                        audioManager.playButtonSound();
-                        option.toggle();
-                    }
-                    if (option.getOptionText().equals("Tutorial")) {
                         audioManager.playButtonSound();
                         option.toggle();
                     }
