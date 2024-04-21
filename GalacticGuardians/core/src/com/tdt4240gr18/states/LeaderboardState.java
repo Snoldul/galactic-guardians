@@ -5,12 +5,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.tdt4240gr18.services.audio.AudioManager;
-import com.tdt4240gr18.services.database.DatabaseInterface;
 import com.tdt4240gr18.game.misc.LeaderboardEntry;
-import com.tdt4240gr18.ui.MenuButton;
 import com.tdt4240gr18.game.misc.UserSession;
 import com.tdt4240gr18.graphics.ggTexture;
+import com.tdt4240gr18.services.audio.AudioManager;
+import com.tdt4240gr18.services.database.DatabaseInterface;
+import com.tdt4240gr18.ui.MenuButton;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,8 +23,9 @@ public class LeaderboardState extends State{
 
     // UI elements
     private final BitmapFont font;
+    private final float buttonWidth;
     private final MenuButton leftArrow, rightArrow;
-    private MenuButton myRankButton;
+    private final MenuButton myRankButton;
     private final MenuButton topRankButton;
     private final MenuButton backButton;
     private final ggTexture Backdrop;
@@ -84,38 +85,51 @@ public class LeaderboardState extends State{
         updateEntriesList();
 
         // Arrow buttons setup
-        float buttonWidth = 0.7f;
+        buttonWidth = 0.7f;
         float arrowWidthRatio = buttonWidth / 77 * 12;
         int arrowY = (int) (height - ((int) font.getLineHeight() + buttonOffsetY) * (entriesPerPage + 3) - arrowWidthRatio * width / 2 * 3); // 3/2 is the ratio of height/width
         leftArrow = addArrow(true, 0.2f * width - arrowWidthRatio * width / 2, arrowY, arrowWidthRatio);
         rightArrow = addArrow(false, 0.8f * width - arrowWidthRatio * width / 2, arrowY, arrowWidthRatio);
 
+        // Rank buttons setup
+        float buttonWidthRatio = buttonWidth / 77 * 24; //Rexture size of buttons is 77*24. This will not scale and for further implementation should not be hardcoded
+        topRankButton = addSmallButton("Top", buttonWidthRatio, (0.62f * width - width * buttonWidth / 77*24 / 2), arrowY);
+        myRankButton = addSmallButton("Me", buttonWidthRatio, 0.38f * width - width * buttonWidth / 77*24 / 2, arrowY);
+        topRankButton.setX((float) (width - topRankButton.getTexture().getWidth()) / 2);
+
         // User setup
         setCurrentUser();
         userYValue = (int) (height - ((int) font.getLineHeight() + buttonOffsetY) * (entriesPerPage + 1.5f));
-        databaseInterface.getAllEntries(entries -> {
-            allEntries = entries;
-            Collections.sort(allEntries, (t1, t2) -> t2.getScore() - t1.getScore());
-            totalAmountOfEntries = allEntries.size();
+        databaseInterface.getAllEntries(new DatabaseInterface.OnAllEntriesLoadedListener() {
+            @Override
+            public void onAllEntriesLoaded(List<LeaderboardEntry> entries) {
+                allEntries = entries;
+                Collections.sort(allEntries, (t1, t2) -> t2.getScore() - t1.getScore());
+                userRank = allEntries.indexOf(currentUser) + 1;
+                totalAmountOfEntries = allEntries.size();
+                if (userRank != 0) {
+                    topRankButton.setX(0.62f * width - width * buttonWidth / 77*24 / 2);
+                }
+            }
         });
-
-        // Rank buttons setup
-        float buttonWidthRatio = buttonWidth / 77*24; //Rexture size of buttons is 77*24. This will not scale and for further implementation should not be hardcoded
-        topRankButton = addSmallButton("Top", buttonWidthRatio, (float) (0.62f * width - width * buttonWidth / 77*24 / 2), arrowY);
-        if (currentUser != null) {
-            userRank = allEntries.indexOf(currentUser) + 1;
-            myRankButton = addSmallButton("Me", buttonWidthRatio, 0.38f * width - width * buttonWidth / 77*24 / 2, arrowY);
-        } else {
-            topRankButton.setX((float) (width - topRankButton.getTexture().getWidth()) / 2);
-        }
 
         // Back button setup
         backButton = addBackButton(buttonWidth);
     }
 
     private void setCurrentUser() {
-        if (UserSession.getInstance().isLoggedIn() && databaseInterface.getEntry(UserSession.getInstance().getUsername()) != null){
-            this.currentUser = databaseInterface.getEntry(UserSession.getInstance().getUsername());
+        if (UserSession.getInstance().isLoggedIn()){
+            databaseInterface.getEntry(UserSession.getInstance().getUsername(), new DatabaseInterface.onFullEntryLoadedListener() {
+                @Override
+                public void onSuccess(LeaderboardEntry entry) {
+                    currentUser = entry;
+                }
+
+                @Override
+                public void onFailure(String errorMessage) {
+
+                }
+            });
         }
         else {
             this.currentUser = null;
@@ -212,18 +226,18 @@ public class LeaderboardState extends State{
         sb.draw(Backdrop, (float) width /2 - (float) backdropWidth / 2, height - (Backdrop.getHeight() + buttonOffsetY));
         leftArrow.render(sb, false);
         rightArrow.render(sb, false);
-        if (currentUser != null) {
-            myRankButton.render(sb);
-        }
         topRankButton.render(sb);
         backButton.render(sb);
+        if (userRank != 0) {
+            myRankButton.render(sb);
+        }
 
         if (totalAmountOfEntries != 0 && EntriesList != null) {
             for (int i = 0; i < EntriesList.size(); i++) {
                 EntriesList.get(i).render(sb, font, entryoffsetX + (int) (entryMargin * backdropWidth), height - ((int) font.getLineHeight() + buttonOffsetY) * (i + 1), boxWidth, (i + 1) + (currentPage - 1) * entriesPerPage);
             }
             font.setColor(Color.valueOf("ffffb4"));
-            if (currentUser != null) {
+            if (currentUser != null && userRank != 0) {
                 currentUser.render(sb, font, entryoffsetX + (int) (entryMargin * backdropWidth), userYValue, boxWidth, userRank);
             }
             font.setColor(Color.WHITE);

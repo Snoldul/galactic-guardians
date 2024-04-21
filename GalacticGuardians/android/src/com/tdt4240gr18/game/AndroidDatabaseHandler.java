@@ -33,23 +33,21 @@ public class AndroidDatabaseHandler implements DatabaseInterface {
         mFirestore = FirebaseFirestore.getInstance();
     }
 
-    public LeaderboardEntry getEntry(String username) {
+    public void getEntry(String username, onFullEntryLoadedListener listener) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("").child("LeaderboardEntries").child(username);
         LeaderboardEntry entry = new LeaderboardEntry(username, 0);
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+        ref.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DataSnapshot snapshot = task.getResult();
                 Integer scoreValue = snapshot.child("score").getValue(Integer.class);
                 int score = (scoreValue != null) ? scoreValue : -1;
                 entry.setScore(score);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                System.out.println("Failed to read value: " + error.toException());
+                listener.onSuccess(entry);
+            } else {
+                listener.onFailure(Objects.requireNonNull(task.getException()).getMessage());
             }
         });
-        return entry;
     }
 
     @Override
@@ -164,21 +162,19 @@ public class AndroidDatabaseHandler implements DatabaseInterface {
     }
 
     @Override
-    public void getAllEntries(OnDataLoadedCallback callback) {
-
-        ArrayList<LeaderboardEntry> entries = new ArrayList<>();
-
+    public void getAllEntries(DatabaseInterface.OnAllEntriesLoadedListener listener) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("").child("LeaderboardEntries");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ArrayList<LeaderboardEntry> allEntries = new ArrayList<>();
                 for (DataSnapshot entrySnapshot : snapshot.getChildren()) {
                     String username = entrySnapshot.getKey();
                     Integer scoreValue = entrySnapshot.child("score").getValue(Integer.class);
                     int score = (scoreValue != null) ? scoreValue : -1;
-                    entries.add(new LeaderboardEntry(username, score));
+                    allEntries.add(new LeaderboardEntry(username, score));
                 }
-                callback.onDataLoaded(entries);
+                listener.onAllEntriesLoaded(allEntries);
             }
 
             @Override

@@ -3,7 +3,6 @@ package com.tdt4240gr18.game;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.tdt4240gr18.GalacticGuardians;
-import com.tdt4240gr18.game.misc.LeaderboardEntry;
 import com.tdt4240gr18.services.database.DatabaseInterface;
 import com.tdt4240gr18.utils.OnDataLoadedCallback;
 
@@ -38,7 +37,13 @@ public class DesktopLauncher {
 			}
 
 			@Override
-			public void getAllEntries(OnDataLoadedCallback callback) {
+			public void checkIfUserExists(String username, String email, OnCheckUserListener userAlreadyExists) {
+
+			}
+
+			@Override
+			public void getAllEntries(OnAllEntriesLoadedListener listener) {
+
 			}
 
 			@Override
@@ -46,8 +51,7 @@ public class DesktopLauncher {
 			}
 
 			@Override
-			public LeaderboardEntry getEntry(String username) {
-				return null;
+			public void getEntry(String username, onFullEntryLoadedListener listener) {
 			}
 
 			@Override
