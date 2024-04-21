@@ -127,6 +127,7 @@ public class OptionsState extends State{
                         audioManager.playButtonSound();
                         option.toggle();
                     }
+
                 }
             }
         }
