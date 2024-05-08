@@ -87,34 +87,47 @@ public class LeaderboardState extends State{
         // Arrow buttons setup
         buttonWidth = 0.7f;
         float arrowWidthRatio = buttonWidth / 77 * 12;
-        int arrowY = (int) (height - ((int) font.getLineHeight() + buttonOffsetY) * (entriesPerPage + 3) - arrowWidthRatio * width / 2 * 3); // 3/2 is the ratio of height/width
+        float arrowY = (int) (height - ((int) font.getLineHeight() + buttonOffsetY) * (entriesPerPage + 3) - arrowWidthRatio * width / 2 * 3); // 3/2 is the ratio of height/width
         leftArrow = addArrow(true, 0.2f * width - arrowWidthRatio * width / 2, arrowY, arrowWidthRatio);
         rightArrow = addArrow(false, 0.8f * width - arrowWidthRatio * width / 2, arrowY, arrowWidthRatio);
 
         // Rank buttons setup
         float buttonWidthRatio = buttonWidth / 77 * 24; //Rexture size of buttons is 77*24. This will not scale and for further implementation should not be hardcoded
         topRankButton = addSmallButton("Top", buttonWidthRatio, (0.62f * width - width * buttonWidth / 77*24 / 2), arrowY);
-        myRankButton = addSmallButton("Me", buttonWidthRatio, 0.38f * width - width * buttonWidth / 77*24 / 2, arrowY);
+        myRankButton = addSmallButton("Me", buttonWidthRatio, - width, arrowY);
         topRankButton.setX((float) (width - topRankButton.getTexture().getWidth()) / 2);
 
         // User setup
-        setCurrentUser();
+
         userYValue = (int) (height - ((int) font.getLineHeight() + buttonOffsetY) * (entriesPerPage + 1.5f));
-        databaseInterface.getAllEntries(new DatabaseInterface.OnAllEntriesLoadedListener() {
-            @Override
-            public void onAllEntriesLoaded(List<LeaderboardEntry> entries) {
-                allEntries = entries;
-                Collections.sort(allEntries, (t1, t2) -> t2.getScore() - t1.getScore());
-                userRank = allEntries.indexOf(currentUser) + 1;
-                totalAmountOfEntries = allEntries.size();
-                if (userRank != 0) {
-                    topRankButton.setX(0.62f * width - width * buttonWidth / 77*24 / 2);
-                }
+        databaseInterface.getAllEntries(entries -> {
+            allEntries = entries;
+            Collections.sort(allEntries, (t1, t2) -> t2.getScore() - t1.getScore());
+            setCurrentUser();
+            totalAmountOfEntries = allEntries.size();
+            if (currentUser != null) {
+                Gdx.app.log("Current user", currentUser.toString());
+            }
+            if (allEntries != null) {
+                Gdx.app.log("All entries", allEntries.toString());
+            }
+            if (UserSession.getInstance().isLoggedIn()) {
+                Gdx.app.log("userSession", UserSession.getInstance().getUsername());
+            }
+            if (userRank != 0) {
+                Gdx.app.log("User rank", String.valueOf(userRank));
             }
         });
 
         // Back button setup
         backButton = addBackButton(buttonWidth);
+    }
+
+    private void addCurrentUserButtons() {
+        if (currentUser != null) {
+            topRankButton.setX(0.62f * width - width * buttonWidth / 77*24 / 2);
+            myRankButton.setX(0.38f * width - width * buttonWidth / 77*24 / 2);
+        }
     }
 
     private void setCurrentUser() {
@@ -123,11 +136,14 @@ public class LeaderboardState extends State{
                 @Override
                 public void onSuccess(LeaderboardEntry entry) {
                     currentUser = entry;
+                    userRank = allEntries.indexOf(currentUser) + 1;
+                    if (userRank != 0) {
+                        addCurrentUserButtons();
+                    }
                 }
 
                 @Override
                 public void onFailure(String errorMessage) {
-
                 }
             });
         }
@@ -206,8 +222,8 @@ public class LeaderboardState extends State{
             else if (myRankButton != null){
                 if (myRankButton.isClicked(touchX, touchY)) {
                     audioManager.playButtonSound();
-                    if (currentPage != userRank / entriesPerPage + 1) {
-                        currentPage = userRank / entriesPerPage + 1;
+                    if (currentPage != (userRank - 1) / entriesPerPage + 1) {
+                        currentPage = (userRank - 1) / entriesPerPage + 1;
                         updateEntriesList();
                     }
                 }
@@ -228,7 +244,7 @@ public class LeaderboardState extends State{
         rightArrow.render(sb, false);
         topRankButton.render(sb);
         backButton.render(sb);
-        if (userRank != 0) {
+        if (myRankButton != null) {
             myRankButton.render(sb);
         }
 

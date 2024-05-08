@@ -97,7 +97,7 @@ public class LoginState  extends State{
                 else {
                     validEmail = false;
                     if (text.length() > 16 || !isInputValid(text)) {
-                        text = text.replaceAll("[^a-zA-Z0-9?)(\\[\\]{}<>/:%@]", "");
+                        text = text.replaceAll("[^a-z0-9?)(\\[\\]{}<>/\\\\:%@\\s]", "").replaceAll("\\s+", "");
                         validUsername = false;
                     }
                     else {
@@ -117,7 +117,7 @@ public class LoginState  extends State{
         passwordListener = new Input.TextInputListener() {
             @Override
             public void input(String text) {
-                validPassword = text.length() >= 8;
+                validPassword = (text.length() >= 8 && text.length() <= 30);
                 password = text;
                 asterisks = new char[password.length()];
                 Arrays.fill(asterisks, '*');
@@ -178,7 +178,7 @@ public class LoginState  extends State{
         invalidFont.setColor(Color.RED);
 
         invalidAccount = "Invalid email/username";
-        invalidPassword = "Min 8 characters";
+        invalidPassword = "8 - 30 characters";
 
         entryLayout = new GlyphLayout();
         infoLayout = new GlyphLayout();
@@ -235,6 +235,8 @@ public class LoginState  extends State{
                             @Override
                             public void onSuccess(String entry) {
                                 accountEntry = entry;
+                                validEmail = true;
+                                validUsername = false;
                                 databaseInterface.loginUser(accountEntry, password, new DatabaseInterface.OnLoginListener() {
                                     @Override
                                     public void onSuccess() {
@@ -246,7 +248,7 @@ public class LoginState  extends State{
                                     @Override
                                     public void onFailure(String errorMessage) {
                                         // Show error message
-                                        gsm.push(new ErrorState(gsm, "Login failed", font));
+                                        gsm.push(new ErrorState(gsm, "Login failed. Are you sure you entered correct username/email and password?", font));
                                     }
                                 });
                             }
