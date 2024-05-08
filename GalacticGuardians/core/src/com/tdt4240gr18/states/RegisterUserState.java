@@ -100,15 +100,17 @@ public class RegisterUserState  extends State{
         usernameListener = new Input.TextInputListener() {
             @Override
             public void input(String text) {
+                invalidUsername = "Max 16 characters";
                 if (text.length() > 16) {
                     username = text.substring(0, 16).toLowerCase();
                 }
                 else {
                     if (!isInputValid(text)) {
-                        username = text.replaceAll("[^a-z0-9?)(\\[\\]{}<>/\\\\:%@]", "");
+                        username = text.replaceAll("[^a-z0-9?)(\\[\\]{}<>/\\\\:%@\\s]", "").replaceAll("\\s+", "");
+                        invalidUsername = "Illegal character removed";
                         validUsername = false;
                     } else {
-                        // Set username to lowercase to avoid case sensitivity in database
+                        // Set username to lowercase to avoid case sensit ivity in database
                         username = text.toLowerCase();
                         validUsername = true;
                     }
@@ -124,7 +126,7 @@ public class RegisterUserState  extends State{
         passwordListener = new Input.TextInputListener() {
             @Override
             public void input(String text) {
-                validPassword = (text.length() >= 8 && text.length() < 30 && isInputValid(text));
+                validPassword = (text.length() >= 8 && text.length() <= 30);
                 password = text;
                 asterisks = new char[password.length()];
                 Arrays.fill(asterisks, '*');
@@ -187,7 +189,7 @@ public class RegisterUserState  extends State{
 
         invalidEmail = "Invalid email";
         invalidUsername = "Max 16 characters";
-        invalidPassword = "Min 8 characters";
+        invalidPassword = "8 - 30 characters";
 
         entryLayout = new GlyphLayout();
         titleLayout = new GlyphLayout(fontTitle, TITLE_TEXT);
